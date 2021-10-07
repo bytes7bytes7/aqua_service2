@@ -1,4 +1,4 @@
-name: client_repository
+name: order_repository
 description: A new Flutter package project.
 version: 0.0.1
 publish_to: none
@@ -10,8 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  rxdart: ^0.27.2
-  equatable: ^2.0.3
+  client_repository:
+    path: ../client_repository
+  fabric_repository:
+    path: ../fabric_repository
 
 dev_dependencies:
   flutter_test:

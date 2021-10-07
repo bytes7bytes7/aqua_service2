@@ -1,5 +1,5 @@
-import 'client.dart';
-import 'fabric.dart';
+import 'package:client_repository/client_repository.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 class Order {
   Order({
