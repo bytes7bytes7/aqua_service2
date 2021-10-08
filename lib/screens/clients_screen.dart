@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:aqua_service2/blocs/blocs.dart';
+import 'package:client_repository/client_repository.dart';
+
+import '../widgets/widgets.dart';
+import '../blocs/blocs.dart';
 
 class ClientsScreen extends StatelessWidget {
   const ClientsScreen({Key? key}) : super(key: key);
@@ -17,21 +20,9 @@ class ClientsScreen extends StatelessWidget {
       body: BlocBuilder<ClientBloc, ClientState>(
         builder: (BuildContext context, ClientState state) {
           if (state is ClientLoadingState) {
-            return const CircularProgressIndicator();
+            return const LoadingCircle();
           } else if (state is ClientDataState) {
-            return Column(
-              children: [
-                ...state.clients.map((e) {
-                  return Text('${e.name} ${e.city}');
-                }).toList(),
-                TextButton(
-                  child: const Text('Refresh'),
-                  onPressed: () {
-                    context.read<ClientBloc>().add(ClientLoadEvent());
-                  },
-                ),
-              ],
-            );
+            return ItemList(items: state.clients);
           } else if (state is ClientErrorState) {
             return Column(
               children: [
@@ -43,6 +34,19 @@ class ClientsScreen extends StatelessWidget {
                   },
                 ),
               ],
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
+      floatingActionButton: BlocBuilder<ClientBloc, ClientState>(
+        builder: (BuildContext context, ClientState state) {
+          if (state is ClientDataState) {
+            return FloatingActionButton(
+              backgroundColor: theme.primaryColor,
+              child: const Icon(Icons.add),
+              onPressed: () {},
             );
           } else {
             return const SizedBox.shrink();
