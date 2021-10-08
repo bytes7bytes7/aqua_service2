@@ -1,5 +1,7 @@
+import 'package:aqua_service2/screens/clients_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:client_repository/client_repository.dart';
 
 import 'blocs/blocs.dart';
 
@@ -14,9 +16,22 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'Aqua Service',
-      home: Scaffold(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) {
+            return ClientBloc(clientRepository: SQLiteClientRepository())
+              ..add(ClientLoadEvent());
+          },
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Aqua Service 2',
+        initialRoute: '/clients',
+        routes: {
+          '/clients': (context) => const ClientsScreen(),
+        },
+      ),
     );
   }
 }

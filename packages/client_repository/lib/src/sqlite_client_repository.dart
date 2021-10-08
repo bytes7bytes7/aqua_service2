@@ -9,14 +9,21 @@ class SQLiteClientRepository extends ClientRepository {
 
   @override
   Stream<List<Client>> clients() {
-    return Stream.value(List.generate(
-      3,
-      (index) => Client(
-        id: index,
-        name: 'Name $index',
-        city: 'City $index',
+    return Stream.fromFuture(
+      Future.delayed(
+        const Duration(seconds: 3),
+        () {
+          return List.generate(
+            3,
+            (index) => Client(
+              id: index,
+              name: 'Name $index',
+              city: 'City $index',
+            ),
+          );
+        },
       ),
-    ));
+    );
   }
 
   @override

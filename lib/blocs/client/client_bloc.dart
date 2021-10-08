@@ -20,11 +20,19 @@ class ClientBloc extends Bloc<ClientEvent, ClientState> {
 
   final ClientRepository _clientRepository;
 
-  void _loadClient(ClientLoadEvent event, Emitter<ClientState> emit) {
+  Future<void> _loadClient(ClientLoadEvent event, Emitter<ClientState> emit) {
+    // maybe I need an error catcher here
     // maybe I need to add new Event before I emit new State
-    emit.onEach<List<Client>>(
+    if (state is! ClientLoadingState) {
+      emit(ClientLoadingState());
+    }
+    return emit.onEach<List<Client>>(
       _clientRepository.clients(),
-      onData: (clients) => emit(ClientDataState(clients)),
+      onData: (clients) => emit(
+        ClientDataState(clients),
+      ),
+      onError: (Object error, StackTrace stackTrace) =>
+          emit(ClientErrorState('$error\n\n$stackTrace')),
     );
   }
 
