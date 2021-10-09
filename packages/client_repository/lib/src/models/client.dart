@@ -70,22 +70,34 @@ class Client {
 
   @override
   String toString() {
-    return 'Client {id : $id, avatarPath : $avatarPath, name : $name, city : $city, address : $address, phone : $phone, volume : $volume, previousDate : $previousDate, nextDate : $nextDate, images : $images, comment : $comment}';
+    return 'Client {'
+        'id : $id, '
+        'avatarPath : $avatarPath, '
+        'name : $name, '
+        'city : $city, '
+        'address : $address, '
+        'phone : $phone, '
+        'volume : $volume, '
+        'previousDate : $previousDate, '
+        'nextDate : $nextDate, '
+        'images : $images, '
+        'comment : $comment'
+        '}';
   }
 
-  ClientEntity? toEntity() {
+  ClientEntity toEntity() {
     return ClientEntity(
       id: id,
-      avatarPath: avatarPath,
+      avatarPath: avatarPath.isNotEmpty ? avatarPath : null,
       name: name,
       city: city,
-      address: address,
-      phone: phone,
-      volume: volume,
-      previousDate: previousDate,
-      nextDate: nextDate,
-      images: images,
-      comment: comment,
+      address: address.isNotEmpty ? address : null,
+      phone: phone.isNotEmpty ? phone : null,
+      volume: volume.isNotEmpty ? volume : null,
+      previousDate: previousDate.isNotEmpty ? previousDate : null,
+      nextDate: nextDate.isNotEmpty ? nextDate : null,
+      images: images.isNotEmpty ? images.join(';') : null,
+      comment: comment.isNotEmpty ? comment : null,
     );
   }
 
@@ -100,7 +112,7 @@ class Client {
       volume: entity.volume,
       previousDate: entity.previousDate,
       nextDate: entity.nextDate,
-      images: entity.images,
+      images: entity.images?.split(';').toList() ?? [],
       comment: entity.comment,
     );
   }

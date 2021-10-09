@@ -36,9 +36,15 @@ class ClientBloc extends Bloc<ClientEvent, ClientState> {
     );
   }
 
-  void _addClient(ClientAddEvent event, Emitter<ClientState> emit) {}
+  void _addClient(ClientAddEvent event, Emitter<ClientState> emit) {
+    _clientRepository.addClient(event.client);
+  }
 
-  void _updateClient(ClientUpdateEvent event, Emitter<ClientState> emit) {}
+  void _updateClient(ClientUpdateEvent event, Emitter<ClientState> emit) {
+    _clientRepository.updateClient(event.client);
+  }
 
-  void _deleteClient(ClientDeleteEvent event, Emitter<ClientState> emit) {}
+  void _deleteClient(ClientDeleteEvent event, Emitter<ClientState> emit) {
+    _clientRepository.deleteClient(event.client);
+  }
 }

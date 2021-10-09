@@ -24,16 +24,58 @@ class ClientsScreen extends StatelessWidget {
           } else if (state is ClientDataState) {
             return ItemList(items: state.clients);
           } else if (state is ClientErrorState) {
-            return Column(
-              children: [
-                Text('Error: ${state.error}'),
-                TextButton(
-                  child: const Text('Refresh'),
-                  onPressed: () {
-                    context.read<ClientBloc>().add(ClientLoadEvent());
-                  },
+            return Center(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                margin: const EdgeInsets.all(20.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: theme.primaryColor,
+                  ),
                 ),
-              ],
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'ERROR',
+                      style: theme.textTheme.bodyText1,
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 80,
+                      child: ListView(
+                        children: [
+                          Text(state.error),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      child: Text(
+                        'Скопировать',
+                        style: theme.textTheme.subtitle1!.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {},
+                    ),
+                    TextButton(
+                      child: Text(
+                        'Попробовать снова',
+                        style: theme.textTheme.subtitle1!.copyWith(
+                          color: theme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onPressed: () {
+                        context.read<ClientBloc>().add(ClientLoadEvent());
+                      },
+                    ),
+                  ],
+                ),
+              ),
             );
           } else {
             return const SizedBox.shrink();
@@ -46,7 +88,9 @@ class ClientsScreen extends StatelessWidget {
             return FloatingActionButton(
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.add),
-              onPressed: () {},
+              onPressed: () {
+                context.read<ClientBloc>().add(ClientAddEvent(Client()));
+              },
             );
           } else {
             return const SizedBox.shrink();

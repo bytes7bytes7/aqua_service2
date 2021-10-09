@@ -4,6 +4,8 @@ import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 import 'package:order_repository/order_repository.dart';
 
+import 'widgets.dart';
+
 class ItemList extends StatefulWidget {
   const ItemList({
     Key? key,
@@ -27,11 +29,19 @@ class _ItemListState extends State<ItemList> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return OrientationBuilder(
       builder: (context, orientation) {
-        return ListView.builder(
+        return ListView.separated(
           scrollDirection: Axis.vertical,
           itemCount: widget.items.length,
+          separatorBuilder: (context, index){
+            return Divider(
+              color: theme.disabledColor,
+              thickness: 1,
+              height: 1,
+            );
+          },
           itemBuilder: (context, index) {
             final item = widget.items[index];
             return Slidable(
@@ -40,11 +50,11 @@ class _ItemListState extends State<ItemList> {
               direction: Axis.horizontal,
               actionPane: const SlidableDrawerActionPane(),
               actionExtentRatio: 0.25,
-              child: ListItem(widget.items[index]),
+              child: ListCard(widget.items[index]),
               secondaryActions: <Widget>[
                 IconSlideAction(
                   caption: 'Delete',
-                  color: Colors.red,
+                  color: theme.errorColor,
                   icon: Icons.delete,
                   onTap: () {
                     _showSnackBar(
@@ -82,29 +92,15 @@ class _ItemListState extends State<ItemList> {
   }
 }
 
-class ListItem extends StatelessWidget {
-  const ListItem(this.item, {Key? key}) : super(key: key);
+class ListCard extends StatelessWidget {
+  const ListCard(this.item, {Key? key}) : super(key: key);
 
   final Object item;
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
     if (item is Client) {
-      return ListTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.primaryColor,
-          child: Padding(
-            padding: const EdgeInsets.all(1.0),
-            child: CircleAvatar(
-              backgroundColor: theme.scaffoldBackgroundColor,
-              child: Text((item as Client).name[0]),
-            ),
-          ),
-        ),
-        title: Text((item as Client).name),
-        subtitle: Text((item as Client).city),
-      );
+      return ClientCard(item as Client);
     } else if (item is Fabric) {
       return const ListTile(
         leading: CircleAvatar(

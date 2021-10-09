@@ -1,38 +1,53 @@
+import 'package:client_repository/src/constants.dart';
+import 'package:client_repository/src/entities/client_entity.dart';
+import 'package:database_helper/database_helper.dart';
+
 import 'models/client.dart';
 import 'client_repository.dart';
 
-class SQLiteClientRepository extends ClientRepository {
+class SQLiteClientRepository implements ClientRepository {
+  const SQLiteClientRepository();
+
   @override
-  Future<void> addClient(Client client) async {
-    print('SQLiteClientRepository: addClient no implemented');
+  Future<void> initDatabase() async {
+    await SQLiteDatabase.instance.initDatabase(Constants.initDatabase);
   }
 
   @override
   Stream<List<Client>> clients() {
     return Stream.fromFuture(
-      Future.delayed(
-        const Duration(seconds: 3),
-        () {
-          return List.generate(
-            3,
-            (index) => Client(
-              id: index,
-              name: 'Name $index',
-              city: 'City $index',
-            ),
-          );
+      SQLiteDatabase.instance.getNotes(Constants.table).then(
+        (lst) {
+          return lst
+              .map<Client>((e) => Client.fromEntity(ClientEntity.fromMap(e)))
+              .toList();
         },
       ),
     );
   }
 
   @override
+  Future<void> addClient(Client client) async {
+    return SQLiteDatabase.instance.addNote(
+      Constants.table,
+      client.toEntity().toMap(),
+    );
+  }
+
+  @override
   Future<void> deleteClient(Client client) async {
-    print('SQLiteClientRepository: deleteClient no implemented');
+    return SQLiteDatabase.instance.deleteNote(
+      Constants.table,
+      {Constants.id: client.id!},
+    );
   }
 
   @override
   Future<void> updateClient(Client client) async {
-    print('SQLiteClientRepository: updateClient no implemented');
+    return SQLiteDatabase.instance.updateNote(
+      Constants.table,
+      client.toEntity().toMap(),
+      {Constants.id: client.id!},
+    );
   }
 }

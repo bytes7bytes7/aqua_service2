@@ -1,6 +1,8 @@
 import 'models/client.dart';
 
 abstract class ClientRepository {
+  Future<void> initDatabase();
+
   Stream<List<Client>> clients();
 
   Future<void> addClient(Client client);

@@ -6,9 +6,12 @@ import 'screens/clients_screen.dart';
 import 'themes/light_theme.dart';
 import 'blocs/blocs.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
+  await const SQLiteClientRepository().initDatabase();
+  // await const SQLiteFabricRepository().initDatabase();
+  // await const SQLiteOrderRepository().initDatabase();
   runApp(const App());
 }
 
@@ -21,8 +24,9 @@ class App extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) {
-            return ClientBloc(clientRepository: SQLiteClientRepository())
-              ..add(ClientLoadEvent());
+            return ClientBloc(
+              clientRepository: const SQLiteClientRepository(),
+            )..add(ClientLoadEvent());
           },
         ),
       ],

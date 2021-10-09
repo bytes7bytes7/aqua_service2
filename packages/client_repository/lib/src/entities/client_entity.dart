@@ -24,7 +24,7 @@ class ClientEntity extends Equatable {
   final String? volume;
   final String? previousDate;
   final String? nextDate;
-  final List<String>? images;
+  final String? images;
   final String? comment;
 
   ClientEntity.fromMap(Map<String, Object?> map)
@@ -37,7 +37,7 @@ class ClientEntity extends Equatable {
         volume = map['volume'] as String?,
         previousDate = map['previousDate'] as String?,
         nextDate = map['nextDate'] as String?,
-        images = map['images'] as List<String>?,
+        images = map['images'] as String?,
         comment = map['comment'] as String?;
 
   @override
@@ -57,12 +57,24 @@ class ClientEntity extends Equatable {
 
   @override
   String toString() {
-    return 'ClientEntity { id: $id, avatarPath: $avatarPath, name: $name, city: $city, address: $address, phone: $phone, volume: $volume, previousDate: $previousDate, nextDate: $nextDate, images: $images, comment: $comment,}';
+    return 'ClientEntity {'
+        'id: $id, '
+        'avatarPath: $avatarPath, '
+        'name: $name, '
+        'city: $city, '
+        'address: $address, '
+        'phone: $phone, '
+        'volume: $volume, '
+        'previousDate: $previousDate, '
+        'nextDate: $nextDate, '
+        'images: $images, '
+        'comment: $comment,'
+        '}';
   }
 
   Map<String, Object?> toMap() {
     return {
-      'id': id,
+      // don't need id
       'avatarPath': avatarPath,
       'name': name,
       'city': city,
