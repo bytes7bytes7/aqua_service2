@@ -1,16 +1,21 @@
-import 'package:client_repository/src/constants.dart';
-import 'package:client_repository/src/entities/client_entity.dart';
 import 'package:database_helper/database_helper.dart';
 
-import 'models/client.dart';
+import 'entities/entities.dart';
+import 'models/models.dart';
 import 'client_repository.dart';
+import 'constants.dart';
 
 class SQLiteClientRepository implements ClientRepository {
   const SQLiteClientRepository();
 
   @override
-  Future<void> initDatabase() async {
-    await SQLiteDatabase.instance.initDatabase(Constants.initDatabase);
+  Future<void> initTable() async {
+    await SQLiteDatabase.instance.init(Constants.initTable);
+  }
+
+  @override
+  Future<void> dropTable() async {
+    await SQLiteDatabase.instance.dropTable(Constants.table, Constants.initTable);
   }
 
   @override
@@ -27,10 +32,34 @@ class SQLiteClientRepository implements ClientRepository {
   }
 
   @override
+  Future<Client> getClient(int id) async {
+    var map = await SQLiteDatabase.instance.getNote(Constants.table, {Constants.id : id});
+    return Client.fromEntity(ClientEntity.fromMap(map));
+  }
+
+  @override
   Future<void> addClient(Client client) async {
-    return SQLiteDatabase.instance.addNote(
+    return SQLiteDatabase.instance.addNotes(
+      Constants.table,
+      [client.toEntity().toMap()],
+    );
+  }
+
+  @override
+  Future<void> addClients(List<Client> clients) {
+    List<Map<String, Object?>> lst = [];
+    for(Client c in clients){
+      lst.add(c.toEntity().toMap());
+    }
+    return SQLiteDatabase.instance.addNotes(Constants.table, lst);
+  }
+
+  @override
+  Future<void> updateClient(Client client) async {
+    return SQLiteDatabase.instance.updateNote(
       Constants.table,
       client.toEntity().toMap(),
+      {Constants.id: client.id!},
     );
   }
 
@@ -43,11 +72,7 @@ class SQLiteClientRepository implements ClientRepository {
   }
 
   @override
-  Future<void> updateClient(Client client) async {
-    return SQLiteDatabase.instance.updateNote(
-      Constants.table,
-      client.toEntity().toMap(),
-      {Constants.id: client.id!},
-    );
+  Future<void> deleteClients() async {
+    return SQLiteDatabase.instance.deleteNotes(Constants.table);
   }
 }

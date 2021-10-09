@@ -9,9 +9,9 @@ import 'blocs/blocs.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
-  await const SQLiteClientRepository().initDatabase();
-  // await const SQLiteFabricRepository().initDatabase();
-  // await const SQLiteOrderRepository().initDatabase();
+  await const SQLiteClientRepository().initTable();
+  // await const SQLiteFabricRepository().initTable();
+  // await const SQLiteOrderRepository().initTable();
   runApp(const App());
 }
 

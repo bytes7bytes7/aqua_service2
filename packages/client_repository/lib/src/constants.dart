@@ -13,7 +13,7 @@ abstract class Constants {
   static const String images = 'images';
   static const String comment = 'comment';
 
-  static const String initDatabase = '''
+  static const String initTable = '''
     CREATE TABLE IF NOT EXISTS $table (
       $id INTEGER PRIMARY KEY,
       $avatarPath TEXT NULL,

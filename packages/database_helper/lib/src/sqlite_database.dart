@@ -30,7 +30,7 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> initDatabase(String sql) async {
+  Future<void> init(String sql) async {
     final db = await database;
     await db.execute(sql);
   }
@@ -39,7 +39,7 @@ class SQLiteDatabase implements DatabaseHelper {
   Future<void> dropTable(String table, String sql) async {
     final db = await database;
     await db.execute('DROP TABLE IF EXISTS $table;');
-    await initDatabase(sql);
+    await init(sql);
   }
 
   @override
@@ -48,8 +48,7 @@ class SQLiteDatabase implements DatabaseHelper {
     final db = await database;
     var data = await db.query(table,
         where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
-    print('data: $data');
-    return {};
+    return data.first;
   }
 
   @override
@@ -59,27 +58,40 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> addNote(String table, Map<String, Object?> map) async {
+  Future<void> addNote(String table, Map<String, Object?> map) async{
     final db = await database;
-    print('db.hashCode: ${db.hashCode}');
     await db.insert(table, map);
-    await getNote(table, {'id': 1});
   }
 
   @override
-  Future<void> addNotes(String table, List<Map<String, Object?>> map) async {}
-
+  Future<void> addNotes(String table, List<Map<String, Object?>> lst) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for(Map<String, Object?> map in lst){
+        // maybe I don't need to await
+        await txn.insert(table, map);
+      }
+    });
+  }
+  
   @override
   Future<void> updateNote(String table, Map<String, Object?> map,
-      Map<String, Object> params) async {}
-
-  @override
-  Future<void> deleteNote(String table, Map<String, Object> params) async {
+      Map<String, Object> params) async {
     final db = await database;
-    db.delete(table,
+    await db.update(table, map,
         where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
   }
 
   @override
-  Future<void> deleteNotes(String table) async {}
+  Future<void> deleteNote(String table, Map<String, Object> params) async {
+    final db = await database;
+    await db.delete(table,
+        where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
+  }
+
+  @override
+  Future<void> deleteNotes(String table) async {
+    final db = await database;
+    await db.delete(table);
+  }
 }
