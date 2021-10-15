@@ -20,6 +20,11 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO: try it
+    // // Need to: import 'package:flutter/services.dart';
+    // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    //   statusBarColor: Colors.purple,
+    // ));
     return MultiBlocProvider(
       providers: [
         BlocProvider(

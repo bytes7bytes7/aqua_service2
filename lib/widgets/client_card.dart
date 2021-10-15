@@ -1,3 +1,4 @@
+import 'package:aqua_service2/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:client_repository/client_repository.dart';
 
@@ -47,6 +48,8 @@ class ClientCard extends StatelessWidget {
       trailing: client.phone.isNotEmpty
           ? IconButton(
               icon: const Icon(Icons.phone),
+              tooltip: ConstantTooltips.call,
+              splashRadius: ConstantSizes.splashRadius,
               color: theme.primaryColor,
               onPressed: () {},
             )

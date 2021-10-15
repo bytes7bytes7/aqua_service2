@@ -1,3 +1,4 @@
+import 'package:aqua_service2/global/show_ask_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:client_repository/client_repository.dart';
 
@@ -220,11 +221,25 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       ),
                     ),
                   ),
-                  WideButton(
-                    isPositive: false,
-                    title: 'Удалить',
-                    onPressed: () {},
-                  ),
+                  Builder(builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                      child: WideButton(
+                        isPositive: false,
+                        title: 'Удалить',
+                        onPressed: () {
+                          showAskBottomSheet(
+                            context: context,
+                            title: 'Вы действительно хотите удалить клиента?',
+                            text1: 'Отмена',
+                            text2: 'Удалить',
+                            onPressed1: () {},
+                            onPressed2: () {},
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),

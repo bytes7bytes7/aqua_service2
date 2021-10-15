@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
-import 'screens.dart';
 import '../global/custom_route.dart';
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
+import 'client_edit_screen.dart';
 
 class ClientsScreen extends StatelessWidget {
   const ClientsScreen({Key? key}) : super(key: key);
@@ -23,7 +23,7 @@ class ClientsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       appBar: const DrawerAppBar(title: 'Клиенты'),
-      drawer: const Drawer(),
+      drawer: const AppDrawer(),
       body: BlocBuilder<ClientBloc, ClientState>(
         builder: (BuildContext context, ClientState state) {
           if (state is ClientLoadingState) {
