@@ -9,9 +9,13 @@ class ClientList extends StatefulWidget {
   const ClientList({
     Key? key,
     required this.items,
+    required this.onAdd,
+    required this.onUpdate,
   }) : super(key: key);
 
   final List items;
+  final Function onAdd;
+  final Function onUpdate;
 
   @override
   _ClientListState createState() => _ClientListState();
@@ -47,7 +51,11 @@ class _ClientListState extends State<ClientList> {
           direction: Axis.horizontal,
           actionPane: const SlidableDrawerActionPane(),
           actionExtentRatio: 0.25,
-          child: ClientCard(widget.items[index]),
+          child: ClientCard(
+            client: widget.items[index],
+            onAdd: widget.onAdd,
+            onUpdate: widget.onUpdate,
+          ),
           secondaryActions: <Widget>[
             BlocBuilder<ClientBloc, ClientState>(
                 builder: (BuildContext context, ClientState state) {
@@ -56,7 +64,9 @@ class _ClientListState extends State<ClientList> {
                 color: theme.errorColor,
                 icon: Icons.delete,
                 onTap: () {
-                  context.read<ClientBloc>().add(ClientDeleteEvent(widget.items[index]));
+                  context
+                      .read<ClientBloc>()
+                      .add(ClientDeleteEvent(widget.items[index]));
                   setState(() {
                     widget.items.removeAt(index);
                   });

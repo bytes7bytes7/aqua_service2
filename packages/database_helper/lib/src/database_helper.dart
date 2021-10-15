@@ -12,7 +12,7 @@ abstract class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getNotes(String table);
 
-  Future<void> addNote(String table, Map<String, Object?> map);
+  Future<Map<String, Object?>> addNote(String table, Map<String, Object?> map);
 
   Future<void> addNotes(String table, List<Map<String, Object?>> lst);
 

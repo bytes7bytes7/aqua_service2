@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:client_repository/client_repository.dart';
 
+import 'screens.dart';
+import '../global/custom_route.dart';
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
 
@@ -9,15 +12,28 @@ class ClientsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void onAdd(Client client) {
+      context.read<ClientBloc>().add(ClientAddEvent(client));
+    }
+
+    void onUpdate(Client client) {
+      context.read<ClientBloc>().add(ClientUpdateEvent(client));
+    }
+
     final theme = Theme.of(context);
     return Scaffold(
       appBar: const DrawerAppBar(title: 'Клиенты'),
+      drawer: const Drawer(),
       body: BlocBuilder<ClientBloc, ClientState>(
         builder: (BuildContext context, ClientState state) {
           if (state is ClientLoadingState) {
             return const LoadingCircle();
           } else if (state is ClientDataState) {
-            return ClientList(items: state.clients);
+            return ClientList(
+              items: state.clients,
+              onAdd: onAdd,
+              onUpdate: onUpdate,
+            );
           } else if (state is ClientErrorState) {
             return ErrorCard(
               error: state.error,
@@ -37,7 +53,15 @@ class ClientsScreen extends StatelessWidget {
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.add),
               onPressed: () {
-                Navigator.of(context).pushNamed('/clients/edit');
+                Navigator.of(context).push(
+                  customRoute(
+                    ClientEditScreen(
+                      client: Client(),
+                      onAdd: onAdd,
+                      onUpdate: onUpdate,
+                    ),
+                  ),
+                );
               },
             );
           } else {

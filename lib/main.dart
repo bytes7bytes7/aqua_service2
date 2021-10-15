@@ -37,7 +37,6 @@ class App extends StatelessWidget {
         initialRoute: '/clients',
         routes: {
           '/clients': (context) => const ClientsScreen(),
-          '/clients/edit': (context) => const ClientEditScreen(),
         },
       ),
     );

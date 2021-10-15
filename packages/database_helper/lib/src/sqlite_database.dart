@@ -81,9 +81,11 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> addNote(String table, Map<String, Object?> map) async {
+  Future<Map<String, Object?>> addNote(String table, Map<String, Object?> map) async {
     final db = await database;
     await db.insert(table, map);
+    var lst = await db.query(table);
+    return lst.last;
   }
 
   @override

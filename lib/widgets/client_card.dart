@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:client_repository/client_repository.dart';
 
+import '../global/custom_route.dart';
+import '../screens/screens.dart';
+
 class ClientCard extends StatelessWidget {
-  const ClientCard(this.client, {Key? key}) : super(key: key);
+  const ClientCard({
+    Key? key,
+    required this.client,
+    required this.onAdd,
+    required this.onUpdate,
+  }) : super(key: key);
 
   final Client client;
+  final Function onAdd;
+  final Function onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +53,15 @@ class ClientCard extends StatelessWidget {
           : const SizedBox.shrink(),
       hoverColor: theme.disabledColor,
       onTap: () {
-        Navigator.of(context).pushNamed('/clients/edit');
+        Navigator.of(context).push(
+          customRoute(
+            ClientEditScreen(
+              client: client,
+              onAdd: onAdd,
+              onUpdate: onUpdate,
+            ),
+          ),
+        );
       },
     );
   }

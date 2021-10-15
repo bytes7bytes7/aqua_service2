@@ -40,10 +40,11 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> addClient(Client client) async {
-    return SQLiteDatabase.instance.addNotes(
+    Map map = await SQLiteDatabase.instance.addNote(
       Constants.table,
-      [client.toEntity().toMap()],
+      client.toEntity().toMap(),
     );
+    client.id = map[Constants.id];
   }
 
   @override
