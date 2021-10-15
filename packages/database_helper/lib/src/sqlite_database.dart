@@ -30,16 +30,39 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> init(String sql) async {
+  Future<void> init(String table, Map<String, Map<Type, bool>> fields) async {
     final db = await database;
+    String sql = 'CREATE TABLE IF NOT EXISTS $table (';
+    for (var entity in fields.entries) {
+      String key = entity.key;
+      String nullable = entity.value.values.first ? 'NULL' : '';
+      String type = '';
+      switch (entity.value.keys.first) {
+        case int:
+          type = 'INTEGER';
+          break;
+        case String:
+          type = 'TEXT';
+          break;
+        case double:
+          type = 'REAL';
+          break;
+      }
+      if (entity.key == fields.entries.first.key){
+        type += ' PRIMARY KEY';
+      }
+      sql += '$key $type $nullable,';
+    }
+    sql = sql.substring(0, sql.length - 1) + ')';
     await db.execute(sql);
   }
 
   @override
-  Future<void> dropTable(String table, String sql) async {
+  Future<void> dropTable(
+      String table, Map<String, Map<Type, bool>> fields) async {
     final db = await database;
     await db.execute('DROP TABLE IF EXISTS $table;');
-    await init(sql);
+    await init(table, fields);
   }
 
   @override
@@ -58,7 +81,7 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> addNote(String table, Map<String, Object?> map) async{
+  Future<void> addNote(String table, Map<String, Object?> map) async {
     final db = await database;
     await db.insert(table, map);
   }
@@ -67,13 +90,13 @@ class SQLiteDatabase implements DatabaseHelper {
   Future<void> addNotes(String table, List<Map<String, Object?>> lst) async {
     final db = await database;
     await db.transaction((txn) async {
-      for(Map<String, Object?> map in lst){
+      for (Map<String, Object?> map in lst) {
         // maybe I don't need to await
         await txn.insert(table, map);
       }
     });
   }
-  
+
   @override
   Future<void> updateNote(String table, Map<String, Object?> map,
       Map<String, Object> params) async {

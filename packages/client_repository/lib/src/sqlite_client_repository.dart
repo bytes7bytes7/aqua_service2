@@ -10,12 +10,12 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> initTable() async {
-    await SQLiteDatabase.instance.init(Constants.initTable);
+    await SQLiteDatabase.instance.init(Constants.table, Constants.fields);
   }
 
   @override
   Future<void> dropTable() async {
-    await SQLiteDatabase.instance.dropTable(Constants.table, Constants.initTable);
+    await SQLiteDatabase.instance.dropTable(Constants.table, Constants.fields);
   }
 
   @override
@@ -33,7 +33,8 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<Client> getClient(int id) async {
-    var map = await SQLiteDatabase.instance.getNote(Constants.table, {Constants.id : id});
+    var map = await SQLiteDatabase.instance
+        .getNote(Constants.table, {Constants.id: id});
     return Client.fromEntity(ClientEntity.fromMap(map));
   }
 
@@ -48,7 +49,7 @@ class SQLiteClientRepository implements ClientRepository {
   @override
   Future<void> addClients(List<Client> clients) {
     List<Map<String, Object?>> lst = [];
-    for(Client c in clients){
+    for (Client c in clients) {
       lst.add(c.toEntity().toMap());
     }
     return SQLiteDatabase.instance.addNotes(Constants.table, lst);

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
-import 'screens/clients_screen.dart';
+import 'screens/screens.dart';
 import 'themes/light_theme.dart';
 import 'blocs/blocs.dart';
 
@@ -37,6 +37,7 @@ class App extends StatelessWidget {
         initialRoute: '/clients',
         routes: {
           '/clients': (context) => const ClientsScreen(),
+          '/clients/edit': (context) => const ClientEditScreen(),
         },
       ),
     );

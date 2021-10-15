@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/constant_colors.dart';
+import '../constants.dart';
 
 ThemeData lightTheme = ThemeData(
   primaryColor: ConstantColors.primaryColor,

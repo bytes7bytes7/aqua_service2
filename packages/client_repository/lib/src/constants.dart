@@ -13,19 +13,17 @@ abstract class Constants {
   static const String images = 'images';
   static const String comment = 'comment';
 
-  static const String initTable = '''
-    CREATE TABLE IF NOT EXISTS $table (
-      $id INTEGER PRIMARY KEY,
-      $avatarPath TEXT NULL,
-      $name TEXT,
-      $city TEXT,
-      $address TEXT NULL,
-      $phone TEXT NULL,
-      $volume TEXT NULL,
-      $previousDate TEXT NULL,
-      $nextDate TEXT NULL,
-      $images TEXT NULL,
-      $comment TEXT NULL
-    )
-  ''';
+  static Map<String, Map<Type, bool>> fields = {
+    id: {int: false},
+    avatarPath: {String: true},
+    name: {String: false},
+    city: {String: false},
+    address: {String: true},
+    phone: {String: true},
+    volume: {String: true},
+    previousDate: {String: true},
+    nextDate: {String: true},
+    images: {String: true},
+    comment: {String: true},
+  };
 }

@@ -8,7 +8,7 @@ class ClientCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    final theme = Theme.of(context);
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,
@@ -41,6 +41,10 @@ class ClientCard extends StatelessWidget {
               onPressed: () {},
             )
           : const SizedBox.shrink(),
+      hoverColor: theme.disabledColor,
+      onTap: () {
+        Navigator.of(context).pushNamed('/clients/edit');
+      },
     );
   }
 }
