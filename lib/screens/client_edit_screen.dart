@@ -245,33 +245,36 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       ),
                     ),
                   ),
-                  Builder(builder: (context) {
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-                      child: WideButton(
-                        isPositive: false,
-                        title: 'Удалить',
-                        onPressed: () {
-                          showAskBottomSheet(
-                            context: context,
-                            title: 'Вы действительно хотите удалить клиента?',
-                            text1: 'Отмена',
-                            text2: 'Удалить',
-                            onPressed1: () {
-                              Navigator.pop(context);
-                            },
-                            onPressed2: () {
-                              if (widget.client.id != null) {
-                                clientBloc.add(ClientDeleteEvent(widget.client));
-                              }
-                              Navigator.pop(context);
-                              Navigator.pop(context);
-                            },
-                          );
-                        },
-                      ),
-                    );
-                  }),
+                  Builder(
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                        child: WideButton(
+                          isPositive: false,
+                          title: 'Удалить',
+                          onPressed: () {
+                            showAskBottomSheet(
+                              context: context,
+                              title: 'Вы действительно хотите удалить клиента?',
+                              text1: 'Отмена',
+                              text2: 'Удалить',
+                              onPressed1: () {
+                                Navigator.pop(context);
+                              },
+                              onPressed2: () {
+                                if (widget.client.id != null) {
+                                  clientBloc
+                                      .add(ClientDeleteEvent(widget.client));
+                                }
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),

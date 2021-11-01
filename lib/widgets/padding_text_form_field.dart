@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/tooltips.dart' as constant_tooltips;
 
-typedef OnSaveCallback = void Function(String?);
+typedef VoidStringCallback = void Function(String?);
 typedef ValidatorCallback = String? Function(String?);
 
 class PaddingTextFormField extends StatefulWidget {
@@ -14,6 +14,7 @@ class PaddingTextFormField extends StatefulWidget {
     required this.value,
     required this.onSave,
     this.validator,
+    this.onChanged,
     this.isPhoneNumber = false,
     this.keyboardType = TextInputType.name,
     this.expands = false,
@@ -21,8 +22,9 @@ class PaddingTextFormField extends StatefulWidget {
 
   final String title;
   final String? value;
-  final OnSaveCallback onSave;
+  final VoidStringCallback onSave;
   final ValidatorCallback? validator;
+  final VoidStringCallback? onChanged;
   final bool isPhoneNumber;
   final TextInputType keyboardType;
   final bool expands;
@@ -61,6 +63,7 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
         keyboardType: widget.keyboardType,
         onSaved: widget.onSave,
         validator: widget.validator,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 27.0, vertical: 16.0),

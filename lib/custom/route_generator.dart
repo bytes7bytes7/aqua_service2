@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client_repository/client_repository.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 import '../screens/screens.dart';
 import '../constants/routes.dart' as constant_routes;
@@ -19,6 +20,11 @@ class RouteGenerator {
         );
       case constant_routes.fabrics:
         return _left(const FabricsScreen());
+      case constant_routes.fabricEdit:
+        Fabric? fabric = args['fabric'];
+        return _up(
+          FabricEditScreen(fabric: fabric ?? Fabric()),
+        );
       default:
         return _left(const NotFoundScreen());
     }
