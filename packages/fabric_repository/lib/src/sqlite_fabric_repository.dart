@@ -2,11 +2,11 @@ import 'package:database_helper/database_helper.dart';
 
 import 'entities/entities.dart';
 import 'models/models.dart';
-import 'client_repository.dart';
+import 'fabric_repository.dart';
 import 'constants.dart' as constants;
 
-class SQLiteClientRepository implements ClientRepository {
-  const SQLiteClientRepository();
+class SQLiteFabricRepository implements FabricRepository {
+  const SQLiteFabricRepository();
 
   @override
   Future<void> initTable() async {
@@ -19,12 +19,12 @@ class SQLiteClientRepository implements ClientRepository {
   }
 
   @override
-  Stream<List<Client>> clients() {
+  Stream<List<Fabric>> fabrics() {
     return Stream.fromFuture(
       SQLiteDatabase.instance.getNotes(constants.table).then(
         (lst) {
           return lst
-              .map<Client>((e) => Client.fromEntity(ClientEntity.fromMap(e)))
+              .map<Fabric>((e) => Fabric.fromEntity(FabricEntity.fromMap(e)))
               .toList();
         },
       ),
@@ -32,49 +32,49 @@ class SQLiteClientRepository implements ClientRepository {
   }
 
   @override
-  Future<Client> getClient(int id) async {
+  Future<Fabric> getFabric(int id) async {
     var map = await SQLiteDatabase.instance
         .getNote(constants.table, {constants.id: id});
-    return Client.fromEntity(ClientEntity.fromMap(map));
+    return Fabric.fromEntity(FabricEntity.fromMap(map));
   }
 
   @override
-  Future<void> addClient(Client client) async {
+  Future<void> addFabric(Fabric fabric) async {
     Map map = await SQLiteDatabase.instance.addNote(
       constants.table,
-      client.toEntity().toMap(),
+      fabric.toEntity().toMap(),
     );
-    client.id = map[constants.id];
+    fabric.id = map[constants.id];
   }
 
   @override
-  Future<void> addClients(List<Client> clients) {
+  Future<void> addFabrics(List<Fabric> fabrics) async {
     List<Map<String, Object?>> lst = [];
-    for (Client c in clients) {
-      lst.add(c.toEntity().toMap());
+    for (Fabric f in fabrics) {
+      lst.add(f.toEntity().toMap());
     }
     return SQLiteDatabase.instance.addNotes(constants.table, lst);
   }
 
   @override
-  Future<void> updateClient(Client client) async {
+  Future<void> updateFabric(Fabric fabric) async {
     return SQLiteDatabase.instance.updateNote(
       constants.table,
-      client.toEntity().toMap(),
-      {constants.id: client.id!},
+      fabric.toEntity().toMap(),
+      {constants.id: fabric.id!},
     );
   }
 
   @override
-  Future<void> deleteClient(Client client) async {
+  Future<void> deleteFabric(Fabric fabric) async {
     return SQLiteDatabase.instance.deleteNote(
       constants.table,
-      {constants.id: client.id!},
+      {constants.id: fabric.id!},
     );
   }
 
   @override
-  Future<void> deleteClients() async {
+  Future<void> deleteFabrics() async {
     return SQLiteDatabase.instance.deleteNotes(constants.table);
   }
 }

@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  equatable: ^2.0.3
+  database_helper:
+    path: ../database_helper
 
 dev_dependencies:
   flutter_test:

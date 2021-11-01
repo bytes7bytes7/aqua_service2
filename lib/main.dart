@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 import 'custom/route_generator.dart';
 import 'themes/light_theme.dart';
 import 'blocs/blocs.dart';
-import 'constants.dart';
+import 'constants/routes.dart' as constant_routes;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
   await const SQLiteClientRepository().initTable();
-  // await const SQLiteFabricRepository().initTable();
+  await const SQLiteFabricRepository().initTable();
   // await const SQLiteOrderRepository().initTable();
   runApp(const App());
 }
@@ -31,8 +32,15 @@ class App extends StatelessWidget {
         BlocProvider<ClientBloc>(
           create: (context) {
             return ClientBloc(
-              clientRepository: const SQLiteClientRepository(),
+              const SQLiteClientRepository(),
             )..add(ClientLoadEvent());
+          },
+        ),
+        BlocProvider<FabricBloc>(
+          create: (context) {
+            return FabricBloc(
+              const SQLiteFabricRepository(),
+            )..add(FabricLoadEvent());
           },
         ),
       ],
@@ -40,7 +48,7 @@ class App extends StatelessWidget {
         title: 'Aqua Service 2',
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: ConstantRoutes.clients,
+        initialRoute: constant_routes.clients,
         onGenerateRoute: RouteGenerator.generateRoute,
       ),
     );

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:client_repository/client_repository.dart';
 
-import '../constants.dart';
+import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/sizes.dart' as constant_sizes;
+import '../constants/routes.dart' as constant_routes;
 
 class ClientCard extends StatelessWidget {
   const ClientCard({
@@ -43,8 +45,8 @@ class ClientCard extends StatelessWidget {
       trailing: client.phone.isNotEmpty
           ? IconButton(
               icon: const Icon(Icons.phone),
-              tooltip: ConstantTooltips.call,
-              splashRadius: ConstantSizes.splashRadius,
+              tooltip: constant_tooltips.call,
+              splashRadius: constant_sizes.splashRadius,
               color: theme.primaryColor,
               onPressed: () {
                 url_launcher.launch("tel://${client.phone}");
@@ -54,7 +56,7 @@ class ClientCard extends StatelessWidget {
       hoverColor: theme.disabledColor,
       onTap: () {
         Navigator.of(context).pushNamed(
-          ConstantRoutes.clientEdit,
+          constant_routes.clientEdit,
           arguments: {
             'client': client,
           },

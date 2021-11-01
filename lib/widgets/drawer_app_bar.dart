@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../constants.dart';
+import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/sizes.dart' as constant_sizes;
 
 class DrawerAppBar extends StatelessWidget implements PreferredSizeWidget {
   const DrawerAppBar({
@@ -22,8 +23,8 @@ class DrawerAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.menu),
         color: theme.scaffoldBackgroundColor,
-        tooltip: ConstantTooltips.drawer,
-        splashRadius: ConstantSizes.splashRadius,
+        tooltip: constant_tooltips.drawer,
+        splashRadius: constant_sizes.splashRadius,
         onPressed: () => Scaffold.of(context).openDrawer(),
       ),
     );

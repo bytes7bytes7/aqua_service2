@@ -10,9 +10,9 @@ abstract class ClientState extends Equatable {
 class ClientLoadingState extends ClientState {}
 
 class ClientDataState extends ClientState {
-  final List<Client> clients;
-
   const ClientDataState(this.clients);
+
+  final List<Client> clients;
 
   @override
   List<Object?> get props => [clients];
@@ -22,9 +22,9 @@ class ClientDataState extends ClientState {
 }
 
 class ClientErrorState extends ClientState {
-  final String error;
-
   const ClientErrorState(this.error);
+
+  final String error;
 
   @override
   List<Object?> get props => [error];

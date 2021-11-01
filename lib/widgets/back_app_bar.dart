@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../constants.dart';
+import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/sizes.dart' as constant_sizes;
 
 class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
   const BackAppBar({
@@ -24,8 +25,8 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: IconButton(
         icon: const Icon(Icons.arrow_back),
         color: theme.scaffoldBackgroundColor,
-        tooltip: ConstantTooltips.back,
-        splashRadius: ConstantSizes.splashRadius,
+        tooltip: constant_tooltips.back,
+        splashRadius: constant_sizes.splashRadius,
         onPressed: () {
           Navigator.of(context).pop();
         },
@@ -35,8 +36,8 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             icon: const Icon(Icons.done),
             color: theme.scaffoldBackgroundColor,
-            tooltip: ConstantTooltips.save,
-            splashRadius: ConstantSizes.splashRadius,
+            tooltip: constant_tooltips.save,
+            splashRadius: constant_sizes.splashRadius,
             onPressed: () {
               FocusScope.of(context).requestFocus(FocusNode());
               onPressed!();

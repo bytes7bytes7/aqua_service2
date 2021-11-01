@@ -1,88 +1,137 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
+import '../custom/always_bouncing_scroll_physics.dart';
+import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
+import '../constants/routes.dart' as constant_routes;
 
 class FabricsScreen extends StatelessWidget {
   const FabricsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar:  DrawerAppBar(title: 'Материалы'),
-      drawer: AppDrawer(),
-      body: Center(),
+    final theme = Theme.of(context);
+    final fabricBloc = context.read<FabricBloc>();
+    return Scaffold(
+      appBar: const DrawerAppBar(title: 'Материалы'),
+      drawer: const AppDrawer(),
+      body: BlocBuilder<FabricBloc, FabricState>(
+        builder: (BuildContext context, FabricState state) {
+          if (state is FabricLoadingState) {
+            return const LoadingCircle();
+          } else if (state is FabricDataState) {
+            return _FabricList(
+              items: state.fabrics,
+            );
+          } else if (state is FabricErrorState) {
+            return ErrorCard(
+              error: state.error,
+              onRefresh: () {
+                fabricBloc.add(FabricLoadEvent());
+              },
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
+      floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
+        builder: (BuildContext context, FabricState state) {
+          if (state is FabricDataState) {
+            return FloatingActionButton(
+              backgroundColor: theme.primaryColor,
+              child: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  constant_routes.fabricEdit,
+                  arguments: {
+                    'fabric' : Fabric(),
+                  },
+                );
+              },
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
     );
   }
 }
 
-// class FabricsScreen extends StatelessWidget {
-//   const FabricsScreen({Key? key}) : super(key: key);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     void onAdd(Fabric fabric) {
-//       context.read<FabricBloc>().add(FabricAddEvent(fabric));
-//     }
-//
-//     void onUpdate(Fabric fabric) {
-//       context.read<FabricBloc>().add(FabricUpdateEvent(fabric));
-//     }
-//
-//     void onDelete(Fabric fabric){
-//       context.read<FabricBloc>().add(FabricDeleteEvent(fabric));
-//     }
-//
-//     final theme = Theme.of(context);
-//     return Scaffold(
-//       appBar: const DrawerAppBar(title: 'Материалы'),
-//       drawer: const AppDrawer(),
-//       body: BlocBuilder<FabricBloc, FabricState>(
-//         builder: (BuildContext context, FabricState state) {
-//           if (state is FabricLoadingState) {
-//             return const LoadingCircle();
-//           } else if (state is FabricDataState) {
-//             return FabricList(
-//               items: state.fabrics,
-//               onAdd: onAdd,
-//               onUpdate: onUpdate,
-//               onDelete: onDelete,
-//             );
-//           } else if (state is FabricErrorState) {
-//             return ErrorCard(
-//               error: state.error,
-//               onRefresh: () {
-//                 context.read<FabricBloc>().add(FabricLoadEvent());
-//               },
-//             );
-//           } else {
-//             return const SizedBox.shrink();
-//           }
-//         },
-//       ),
-//       floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
-//         builder: (BuildContext context, FabricState state) {
-//           if (state is FabricDataState) {
-//             return FloatingActionButton(
-//               backgroundColor: theme.primaryColor,
-//               child: const Icon(Icons.add),
-//               onPressed: () {
-//                 Navigator.of(context).push(
-//                   customRoute(
-//                     FabricEditScreen(
-//                       fabric: Fabric(),
-//                       onAdd: onAdd,
-//                       onUpdate: onUpdate,
-//                       onDelete: onDelete,
-//                     ),
-//                   ),
-//                 );
-//               },
-//             );
-//           } else {
-//             return const SizedBox.shrink();
-//           }
-//         },
-//       ),
-//     );
-//   }
-// }
+class _FabricList extends StatefulWidget {
+  const _FabricList({
+    Key? key,
+    required this.items,
+  }) : super(key: key);
+
+  final List items;
+
+  @override
+  __FabricListState createState() => __FabricListState();
+}
+
+class __FabricListState extends State<_FabricList> {
+  late final SlidableController slidableController;
+
+  @override
+  void initState() {
+    slidableController = SlidableController();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fabricBloc = context.read<FabricBloc>();
+    if (widget.items.isEmpty) {
+      return Center(
+        child: Text(
+          'Пусто',
+          style: theme.textTheme.bodyText1,
+        ),
+      );
+    }
+    return ListView.separated(
+      physics: const AlwaysBouncingScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      itemCount: widget.items.length,
+      separatorBuilder: (context, index) {
+        return Divider(
+          color: theme.disabledColor,
+          thickness: 1,
+          height: 1,
+        );
+      },
+      itemBuilder: (context, index) {
+        final item = widget.items[index];
+        return Slidable(
+          key: Key('${item.hashCode}'),
+          controller: slidableController,
+          direction: Axis.horizontal,
+          actionPane: const SlidableDrawerActionPane(),
+          actionExtentRatio: 0.25,
+          child: FabricCard(
+            fabric: item,
+          ),
+          secondaryActions: <Widget>[
+            IconSlideAction(
+              caption: 'Удалить',
+              color: theme.errorColor,
+              icon: Icons.delete,
+              onTap: () {
+                fabricBloc.add(FabricDeleteEvent(item));
+                setState(() {
+                  widget.items.removeAt(index);
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}

@@ -1,5 +1,6 @@
-import 'package:aqua_service2/constants.dart';
 import 'package:flutter/material.dart';
+
+import '../constants/routes.dart' as constant_routes;
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({
@@ -32,14 +33,14 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ...[
-            [Icons.monetization_on, 'Заказы', ConstantRoutes.orders],
-            [Icons.people, 'Клиенты', ConstantRoutes.clients],
-            [Icons.pan_tool, 'Материалы', ConstantRoutes.fabrics],
-            [Icons.report, 'Отчеты', ConstantRoutes.reports],
-            [Icons.date_range, 'Календарь', ConstantRoutes.calendar],
+            [Icons.monetization_on, 'Заказы', constant_routes.orders],
+            [Icons.people, 'Клиенты', constant_routes.clients],
+            [Icons.pan_tool, 'Материалы', constant_routes.fabrics],
+            [Icons.report, 'Отчеты', constant_routes.reports],
+            [Icons.date_range, 'Календарь', constant_routes.calendar],
             [null],
-            [Icons.settings, 'Настройки', ConstantRoutes.settings],
-            [Icons.info, 'О приложении', ConstantRoutes.about],
+            [Icons.settings, 'Настройки', constant_routes.settings],
+            [Icons.info, 'О приложении', constant_routes.about],
           ].map((entity) {
             if (entity[0] == null) {
               return Divider(

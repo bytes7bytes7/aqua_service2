@@ -10,9 +10,9 @@ abstract class ClientEvent extends Equatable {
 class ClientLoadEvent extends ClientEvent {}
 
 class ClientAddEvent extends ClientEvent {
-  final Client client;
-
   const ClientAddEvent(this.client);
+
+  final Client client;
 
   @override
   List<Object?> get props => [client];
@@ -22,9 +22,9 @@ class ClientAddEvent extends ClientEvent {
 }
 
 class ClientUpdateEvent extends ClientEvent {
-  final Client client;
-
   const ClientUpdateEvent(this.client);
+
+  final Client client;
 
   @override
   List<Object?> get props => [client];
@@ -34,9 +34,9 @@ class ClientUpdateEvent extends ClientEvent {
 }
 
 class ClientDeleteEvent extends ClientEvent {
-  final Client client;
-
   const ClientDeleteEvent(this.client);
+
+  final Client client;
 
   @override
   List<Object?> get props => [client];

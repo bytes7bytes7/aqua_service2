@@ -14,6 +14,7 @@ dependencies:
     path: ../client_repository
   fabric_repository:
     path: ../fabric_repository
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_test:

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
-import '../constants.dart';
+import '../constants/sizes.dart' as constant_sizes;
+import '../constants/tooltips.dart' as constant_tooltips;
 
 typedef OnSaveCallback = void Function(String?);
 typedef ValidatorCallback = String? Function(String?);
@@ -85,8 +86,8 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
                   child: IconButton(
                     icon: const Icon(Icons.call),
                     color: theme.primaryColor,
-                    tooltip: ConstantTooltips.call,
-                    splashRadius: ConstantSizes.splashRadius,
+                    tooltip: constant_tooltips.call,
+                    splashRadius: constant_sizes.splashRadius,
                     onPressed: () {
                       if (controller.text.isNotEmpty) {
                         url_launcher.launch("tel://${controller.text}");

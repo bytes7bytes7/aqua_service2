@@ -7,7 +7,7 @@ part 'client_event.dart';
 part 'client_state.dart';
 
 class ClientBloc extends Bloc<ClientEvent, ClientState> {
-  ClientBloc({required ClientRepository clientRepository})
+  ClientBloc(ClientRepository clientRepository)
       :
         // maybe I need a copy of ClientRepository instead of original
         _clientRepository = clientRepository,
@@ -31,8 +31,9 @@ class ClientBloc extends Bloc<ClientEvent, ClientState> {
       onData: (clients) => emit(
         ClientDataState(clients),
       ),
-      onError: (Object error, StackTrace stackTrace) =>
-          emit(ClientErrorState('$error\n\n$stackTrace')),
+      onError: (Object error, StackTrace stackTrace) => emit(
+        ClientErrorState('$error\n\n$stackTrace'),
+      ),
     );
   }
 
