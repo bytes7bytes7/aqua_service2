@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 
 import '../constants.dart';
 
 typedef OnSaveCallback = void Function(String?);
+typedef ValidatorCallback = String? Function(String?);
 
-class PaddingTextFormField extends StatelessWidget {
+class PaddingTextFormField extends StatefulWidget {
   const PaddingTextFormField({
     Key? key,
     required this.title,
     required this.value,
     required this.onSave,
-    this.onPressed,
+    this.validator,
+    this.isPhoneNumber = false,
     this.keyboardType = TextInputType.name,
     this.expands = false,
   }) : super(key: key);
@@ -18,9 +21,29 @@ class PaddingTextFormField extends StatelessWidget {
   final String title;
   final String? value;
   final OnSaveCallback onSave;
-  final VoidCallback? onPressed;
+  final ValidatorCallback? validator;
+  final bool isPhoneNumber;
   final TextInputType keyboardType;
   final bool expands;
+
+  @override
+  State<PaddingTextFormField> createState() => _PaddingTextFormFieldState();
+}
+
+class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
+  late final TextEditingController controller;
+
+  @override
+  void initState() {
+    controller = TextEditingController(text: widget.value);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +51,19 @@ class PaddingTextFormField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 0.0),
       child: TextFormField(
-        controller: TextEditingController(text: value),
+        controller: controller,
         cursorColor: theme.primaryColor,
         style: theme.textTheme.bodyText1,
         textAlignVertical: TextAlignVertical.top,
-        expands: expands,
-        maxLines: expands ? null : 1,
-        keyboardType: keyboardType,
-        onSaved: onSave,
+        expands: widget.expands,
+        maxLines: widget.expands ? null : 1,
+        keyboardType: widget.keyboardType,
+        onSaved: widget.onSave,
+        validator: widget.validator,
         decoration: InputDecoration(
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 27.0, vertical: 16.0),
-          labelText: title,
+          labelText: widget.title,
           alignLabelWithHint: true,
           labelStyle:
               theme.textTheme.bodyText1!.copyWith(color: theme.disabledColor),
@@ -55,7 +79,7 @@ class PaddingTextFormField extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(35),
           ),
-          suffixIcon: onPressed != null
+          suffixIcon: widget.isPhoneNumber
               ? Container(
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
@@ -63,7 +87,11 @@ class PaddingTextFormField extends StatelessWidget {
                     color: theme.primaryColor,
                     tooltip: ConstantTooltips.call,
                     splashRadius: ConstantSizes.splashRadius,
-                    onPressed: onPressed,
+                    onPressed: () {
+                      if (controller.text.isNotEmpty) {
+                        url_launcher.launch("tel://${controller.text}");
+                      }
+                    },
                   ),
                 )
               : null,

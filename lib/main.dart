@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
-import 'screens/screens.dart';
+import 'custom/route_generator.dart';
 import 'themes/light_theme.dart';
 import 'blocs/blocs.dart';
+import 'constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +28,7 @@ class App extends StatelessWidget {
     // ));
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
+        BlocProvider<ClientBloc>(
           create: (context) {
             return ClientBloc(
               clientRepository: const SQLiteClientRepository(),
@@ -39,10 +40,8 @@ class App extends StatelessWidget {
         title: 'Aqua Service 2',
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: '/clients',
-        routes: {
-          '/clients': (context) => const ClientsScreen(),
-        },
+        initialRoute: ConstantRoutes.clients,
+        onGenerateRoute: RouteGenerator.generateRoute,
       ),
     );
   }

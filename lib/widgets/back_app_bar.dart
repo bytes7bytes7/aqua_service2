@@ -37,7 +37,10 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
             color: theme.scaffoldBackgroundColor,
             tooltip: ConstantTooltips.save,
             splashRadius: ConstantSizes.splashRadius,
-            onPressed: onPressed,
+            onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+              onPressed!();
+            },
           ),
       ],
     );

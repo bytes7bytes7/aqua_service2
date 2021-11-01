@@ -1,3 +1,4 @@
+import 'package:aqua_service2/constants.dart';
 import 'package:flutter/material.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -31,16 +32,26 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ...[
-            [Icons.monetization_on, 'Заказы', () {}],
-            [Icons.people, 'Клиенты', () {}],
-            [Icons.pan_tool, 'Материалы', () {}],
-            [Icons.report, 'Отчеты', () {}],
-            [Icons.date_range, 'Календарь', () {}],
+            [Icons.monetization_on, 'Заказы', ConstantRoutes.orders],
+            [Icons.people, 'Клиенты', ConstantRoutes.clients],
+            [Icons.pan_tool, 'Материалы', ConstantRoutes.fabrics],
+            [Icons.report, 'Отчеты', ConstantRoutes.reports],
+            [Icons.date_range, 'Календарь', ConstantRoutes.calendar],
+            [null],
+            [Icons.settings, 'Настройки', ConstantRoutes.settings],
+            [Icons.info, 'О приложении', ConstantRoutes.about],
           ].map((entity) {
+            if (entity[0] == null) {
+              return Divider(
+                color: theme.disabledColor,
+                thickness: 1,
+                height: 1,
+              );
+            }
+
             IconData icon = entity[0] as IconData;
             String title = entity[1] as String;
-            VoidCallback onTap = entity[2] as VoidCallback;
-
+            String route = entity[2] as String;
             return ListTile(
               horizontalTitleGap: 5,
               dense: true,
@@ -52,34 +63,11 @@ class AppDrawer extends StatelessWidget {
                 title,
                 style: theme.textTheme.bodyText1,
               ),
-              onTap: onTap,
-            );
-          }),
-          Divider(
-            color: theme.disabledColor,
-            thickness: 1,
-            height: 1,
-          ),
-          ...[
-            [Icons.settings, 'Настройки', () {}],
-            [Icons.info, 'О приложении', () {}],
-          ].map((entity) {
-            IconData icon = entity[0] as IconData;
-            String title = entity[1] as String;
-            VoidCallback onTap = entity[2] as VoidCallback;
-
-            return ListTile(
-              horizontalTitleGap: 5,
-              dense: true,
-              leading: Icon(
-                icon,
-                color: theme.disabledColor,
-              ),
-              title: Text(
-                title,
-                style: theme.textTheme.bodyText1,
-              ),
-              onTap: onTap,
+              onTap: () {
+                // popUntil -> route that doesn't exist
+                Navigator.popUntil(context, (route) => route.settings.name == '/');
+                Navigator.of(context).pushNamed(route);
+              },
             );
           }),
         ],

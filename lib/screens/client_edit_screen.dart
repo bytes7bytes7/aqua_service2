@@ -1,20 +1,19 @@
-import 'package:aqua_service2/global/show_ask_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
+import '../blocs/blocs.dart';
+import '../custom/always_bouncing_scroll_physics.dart';
+import '../global/show_ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
 
 class ClientEditScreen extends StatefulWidget {
   const ClientEditScreen({
     Key? key,
     required this.client,
-    required this.onAdd,
-    required this.onUpdate,
   }) : super(key: key);
 
   final Client client;
-  final Function onAdd;
-  final Function onUpdate;
 
   @override
   State<ClientEditScreen> createState() => _ClientEditScreenState();
@@ -24,9 +23,15 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
+    final clientBloc = context.read<ClientBloc>();
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -40,14 +45,15 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
             if (currentState != null && currentState.validate()) {
               currentState.save();
               if (widget.client.id != null) {
-                widget.onUpdate(widget.client);
+                clientBloc.add(ClientUpdateEvent(widget.client));
               } else {
-                widget.onAdd(widget.client);
+                clientBloc.add(ClientAddEvent(widget.client));
               }
             }
           },
         ),
         body: SingleChildScrollView(
+          physics: const AlwaysBouncingScrollPhysics(),
           child: Center(
             child: Form(
               key: _formKey,
@@ -61,6 +67,13 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       child: CircleAvatar(
                         backgroundColor: theme.scaffoldBackgroundColor,
                         radius: 45,
+                        child: Text(
+                          widget.client.name.isNotEmpty
+                              ? widget.client.name[0]
+                              : '?',
+                          style: theme.textTheme.headline3!
+                              .copyWith(color: theme.primaryColor),
+                        ),
                       ),
                     ),
                   ),
@@ -153,6 +166,11 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                   PaddingTextFormField(
                     title: 'Имя',
                     value: widget.client.name,
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Заполните поле';
+                      }
+                    },
                     onSave: (String? value) {
                       widget.client.name = value ?? '';
                     },
@@ -160,7 +178,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                   PaddingTextFormField(
                     title: 'Телефон',
                     value: widget.client.phone,
-                    onPressed: () {},
+                    isPhoneNumber: true,
                     keyboardType: TextInputType.number,
                     onSave: (String? value) {
                       widget.client.phone = value ?? '';
@@ -169,6 +187,11 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                   PaddingTextFormField(
                     title: 'Город',
                     value: widget.client.city,
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Заполните поле';
+                      }
+                    },
                     onSave: (String? value) {
                       widget.client.city = value ?? '';
                     },
@@ -192,6 +215,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     child: PaddingTextFormField(
                       title: 'Комментарий',
                       value: widget.client.comment,
+                      keyboardType: TextInputType.multiline,
                       expands: true,
                       onSave: (String? value) {
                         widget.client.comment = value ?? '';
@@ -233,8 +257,16 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                             title: 'Вы действительно хотите удалить клиента?',
                             text1: 'Отмена',
                             text2: 'Удалить',
-                            onPressed1: () {},
-                            onPressed2: () {},
+                            onPressed1: () {
+                              Navigator.pop(context);
+                            },
+                            onPressed2: () {
+                              if (widget.client.id != null) {
+                                clientBloc.add(ClientDeleteEvent(widget.client));
+                              }
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
                           );
                         },
                       ),

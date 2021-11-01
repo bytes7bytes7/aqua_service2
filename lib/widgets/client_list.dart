@@ -1,21 +1,18 @@
+import 'package:aqua_service2/blocs/blocs.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../blocs/blocs.dart';
+import '../custom/always_bouncing_scroll_physics.dart';
 import 'client_card.dart';
 
 class ClientList extends StatefulWidget {
   const ClientList({
     Key? key,
     required this.items,
-    required this.onAdd,
-    required this.onUpdate,
   }) : super(key: key);
 
   final List items;
-  final Function onAdd;
-  final Function onUpdate;
 
   @override
   _ClientListState createState() => _ClientListState();
@@ -33,7 +30,17 @@ class _ClientListState extends State<ClientList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final clientBloc = context.read<ClientBloc>();
+    if (widget.items.isEmpty) {
+      return Center(
+        child: Text(
+          'Пусто',
+          style: theme.textTheme.bodyText1,
+        ),
+      );
+    }
     return ListView.separated(
+      physics: const AlwaysBouncingScrollPhysics(),
       scrollDirection: Axis.vertical,
       itemCount: widget.items.length,
       separatorBuilder: (context, index) {
@@ -52,27 +59,20 @@ class _ClientListState extends State<ClientList> {
           actionPane: const SlidableDrawerActionPane(),
           actionExtentRatio: 0.25,
           child: ClientCard(
-            client: widget.items[index],
-            onAdd: widget.onAdd,
-            onUpdate: widget.onUpdate,
+            client: item,
           ),
           secondaryActions: <Widget>[
-            BlocBuilder<ClientBloc, ClientState>(
-                builder: (BuildContext context, ClientState state) {
-              return IconSlideAction(
-                caption: 'Удалить',
-                color: theme.errorColor,
-                icon: Icons.delete,
-                onTap: () {
-                  context
-                      .read<ClientBloc>()
-                      .add(ClientDeleteEvent(widget.items[index]));
-                  setState(() {
-                    widget.items.removeAt(index);
-                  });
-                },
-              );
-            }),
+            IconSlideAction(
+              caption: 'Удалить',
+              color: theme.errorColor,
+              icon: Icons.delete,
+              onTap: () {
+                clientBloc.add(ClientDeleteEvent(item));
+                setState(() {
+                  widget.items.removeAt(index);
+                });
+              },
+            ),
           ],
         );
       },

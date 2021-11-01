@@ -1,21 +1,16 @@
-import 'package:aqua_service2/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:client_repository/client_repository.dart';
 
-import '../global/custom_route.dart';
-import '../screens/screens.dart';
+import '../constants.dart';
 
 class ClientCard extends StatelessWidget {
   const ClientCard({
     Key? key,
     required this.client,
-    required this.onAdd,
-    required this.onUpdate,
   }) : super(key: key);
 
   final Client client;
-  final Function onAdd;
-  final Function onUpdate;
 
   @override
   Widget build(BuildContext context) {
@@ -51,19 +46,18 @@ class ClientCard extends StatelessWidget {
               tooltip: ConstantTooltips.call,
               splashRadius: ConstantSizes.splashRadius,
               color: theme.primaryColor,
-              onPressed: () {},
+              onPressed: () {
+                url_launcher.launch("tel://${client.phone}");
+              },
             )
           : const SizedBox.shrink(),
       hoverColor: theme.disabledColor,
       onTap: () {
-        Navigator.of(context).push(
-          customRoute(
-            ClientEditScreen(
-              client: client,
-              onAdd: onAdd,
-              onUpdate: onUpdate,
-            ),
-          ),
+        Navigator.of(context).pushNamed(
+          ConstantRoutes.clientEdit,
+          arguments: {
+            'client': client,
+          },
         );
       },
     );

@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
 
+class ConstantRoutes {
+  static const String clients = '/clients';
+  static const String clientEdit = '/client/edit';
+  static const String fabrics = '/fabrics';
+  static const String orders = '/orders';
+  static const String reports = '/reports';
+  static const String calendar = '/calendar';
+  static const String settings = '/settings';
+  static const String about = '/about';
+}
+
 class ConstantColors {
   static const Color primaryColor = Color(0xFF1898AA);
   static const Color shadowColor = Color(0xFF000000);
