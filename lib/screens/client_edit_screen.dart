@@ -26,6 +26,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   late final Client modClient;
   late Client savedClient;
   late final ValueNotifier<bool> avatarNotifier;
+  late final ValueNotifier<bool> imageNotifier;
 
   @override
   void initState() {
@@ -33,12 +34,15 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
     avatarNotifier = ValueNotifier(true);
+    imageNotifier = ValueNotifier(true);
     super.initState();
   }
 
   @override
   void dispose() {
+    isCreated.dispose();
     avatarNotifier.dispose();
+    imageNotifier.dispose();
     super.dispose();
   }
 
@@ -226,13 +230,14 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // TODO: add next & previous dates
                         Text(
-                          'Послед. дата: 03.09.21',
+                          'Послед. дата: ' + widget.client.previousDate,
                           style: theme.textTheme.bodyText1,
                         ),
                         const SizedBox(height: 16.0),
                         Text(
-                          'След. дата: 08.10.21',
+                          'След. дата: ' + widget.client.nextDate,
                           style: theme.textTheme.bodyText1,
                         ),
                       ],
@@ -297,29 +302,95 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       },
                     ),
                   ),
-                  Container(
-                    height: 200,
-                    padding: const EdgeInsets.only(top: 30.0),
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: List.generate(4, (index) {
-                          return Container(
-                            margin: EdgeInsets.only(
-                              left: index == 0 ? 20.0 : 0,
-                              right: 20.0,
+                  ValueListenableBuilder(
+                      valueListenable: imageNotifier,
+                      builder: (context, _, __) {
+                        return Container(
+                          height: 200,
+                          padding: const EdgeInsets.only(top: 30.0),
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              children: List.generate(
+                                modClient.images.length + 1,
+                                (index) {
+                                  if (index == modClient.images.length) {
+                                    return SizedBox(
+                                      width: size.width * 0.7,
+                                      child: OutlinedButton(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.add_photo_alternate,
+                                              color: theme.shadowColor,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Добавить фото',
+                                              style: theme.textTheme.subtitle1,
+                                            )
+                                          ],
+                                        ),
+                                        style: OutlinedButton.styleFrom(
+                                          primary: theme.primaryColor,
+                                          side: BorderSide(
+                                            color: theme.disabledColor,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
+                                        ),
+                                        onPressed: () async {
+                                          String path =
+                                              await ImageService.pickImage();
+                                          if (path.isNotEmpty) {
+                                            modClient.images.add(path);
+                                            imageNotifier.value =
+                                                !imageNotifier.value;
+                                          }
+                                        },
+                                      ),
+                                    );
+                                  }
+                                  return FutureBuilder(
+                                    future: ImageService.loadImage(
+                                        modClient.images[index]),
+                                    builder: (context, AsyncSnapshot snapshot) {
+                                      return Container(
+                                        margin: EdgeInsets.only(
+                                          left: index == 0 ? 20.0 : 0,
+                                          right: 20.0,
+                                        ),
+                                        width: size.width * 0.7,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                          border: Border.all(
+                                            color: theme.disabledColor,
+                                          ),
+                                          color: theme.scaffoldBackgroundColor,
+                                          image: (snapshot.hasData &&
+                                                  snapshot.data.isNotEmpty)
+                                              ? DecorationImage(
+                                                  image: MemoryImage(
+                                                      snapshot.data),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ),
-                            width: size.width * 0.7,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: theme.disabledColor,
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
+                          ),
+                        );
+                      }),
                   ValueListenableBuilder(
                     valueListenable: isCreated,
                     builder: (context, bool value, _) {

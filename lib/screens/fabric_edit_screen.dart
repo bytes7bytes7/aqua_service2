@@ -38,6 +38,13 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
   }
 
   @override
+  void dispose() {
+    isCreated.dispose();
+    profitNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final fabricBloc = context.read<FabricBloc>();
 

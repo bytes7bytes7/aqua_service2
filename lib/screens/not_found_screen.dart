@@ -7,11 +7,15 @@ class NotFoundScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar:  DrawerAppBar(title: 'Страница не найдена'),
-      drawer:  AppDrawer(),
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: const DrawerAppBar(title: 'Ошибка'),
+      drawer: const AppDrawer(),
       body: Center(
-        child:  Text('Стриница не найдена :('),
+        child: Text(
+          'Страница не найдена :(',
+          style: theme.textTheme.bodyText1,
+        ),
       ),
     );
   }
