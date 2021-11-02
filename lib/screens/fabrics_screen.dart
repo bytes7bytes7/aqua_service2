@@ -7,6 +7,7 @@ import '../custom/always_bouncing_scroll_physics.dart';
 import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
 import '../constants/routes.dart' as constant_routes;
+import '../constants/tooltips.dart' as constant_tooltips;
 
 class FabricsScreen extends StatelessWidget {
   const FabricsScreen({Key? key}) : super(key: key);
@@ -42,6 +43,7 @@ class FabricsScreen extends StatelessWidget {
         builder: (BuildContext context, FabricState state) {
           if (state is FabricDataState) {
             return FloatingActionButton(
+              tooltip: constant_tooltips.add,
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.add),
               onPressed: () {

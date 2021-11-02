@@ -7,11 +7,15 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
   const BackAppBar({
     Key? key,
     required this.title,
-    this.onPressed,
+    this.onExit,
+    this.onSave,
+    this.snackBarMsg = 'Готово',
   }) : super(key: key);
 
   final String title;
-  final VoidCallback? onPressed;
+  final String snackBarMsg;
+  final VoidCallback? onExit;
+  final VoidCallback? onSave;
 
   @override
   Size get preferredSize => const Size.fromHeight(56.0);
@@ -27,12 +31,13 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
         color: theme.scaffoldBackgroundColor,
         tooltip: constant_tooltips.back,
         splashRadius: constant_sizes.splashRadius,
-        onPressed: () {
-          Navigator.of(context).pop();
-        },
+        onPressed: onExit ??
+            () {
+              Navigator.of(context).pop();
+            },
       ),
       actions: [
-        if (onPressed != null)
+        if (onSave != null)
           IconButton(
             icon: const Icon(Icons.done),
             color: theme.scaffoldBackgroundColor,
@@ -40,7 +45,7 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
             splashRadius: constant_sizes.splashRadius,
             onPressed: () {
               FocusScope.of(context).requestFocus(FocusNode());
-              onPressed!();
+              onSave!();
             },
           ),
       ],

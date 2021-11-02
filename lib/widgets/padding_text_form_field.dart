@@ -4,7 +4,8 @@ import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/tooltips.dart' as constant_tooltips;
 
-typedef VoidStringCallback = void Function(String?);
+typedef VoidStringCallBack = void Function(String);
+typedef VoidStringNullCallback = void Function(String?);
 typedef ValidatorCallback = String? Function(String?);
 
 class PaddingTextFormField extends StatefulWidget {
@@ -22,9 +23,9 @@ class PaddingTextFormField extends StatefulWidget {
 
   final String title;
   final String? value;
-  final VoidStringCallback onSave;
+  final VoidStringNullCallback onSave;
   final ValidatorCallback? validator;
-  final VoidStringCallback? onChanged;
+  final VoidStringCallBack? onChanged;
   final bool isPhoneNumber;
   final TextInputType keyboardType;
   final bool expands;

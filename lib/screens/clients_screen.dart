@@ -7,6 +7,7 @@ import '../custom/always_bouncing_scroll_physics.dart';
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
 import '../constants/routes.dart' as constant_routes;
+import '../constants/tooltips.dart' as constant_tooltips;
 
 class ClientsScreen extends StatelessWidget {
   const ClientsScreen({Key? key}) : super(key: key);
@@ -42,6 +43,7 @@ class ClientsScreen extends StatelessWidget {
         builder: (BuildContext context, ClientState state) {
           if (state is ClientDataState) {
             return FloatingActionButton(
+              tooltip: constant_tooltips.add,
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.add),
               onPressed: () {

@@ -18,14 +18,19 @@ ThemeData lightTheme = ThemeData(
       fontWeight: FontWeight.bold,
       color: constant_colors.shadowColor,
     ),
+    bodyText1: TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.normal,
+      color: constant_colors.shadowColor,
+    ),
     subtitle1: TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.normal,
       color: constant_colors.shadowColor,
     ),
-    bodyText1: TextStyle(
-      fontSize: 17,
-      fontWeight: FontWeight.normal,
+    subtitle2: TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
       color: constant_colors.shadowColor,
     ),
   ),

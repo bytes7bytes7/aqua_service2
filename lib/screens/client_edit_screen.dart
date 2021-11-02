@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
+import '../services/image_service.dart';
 import '../blocs/blocs.dart';
 import '../custom/always_bouncing_scroll_physics.dart';
 import '../global/show_ask_bottom_sheet.dart';
@@ -21,10 +22,22 @@ class ClientEditScreen extends StatefulWidget {
 
 class _ClientEditScreenState extends State<ClientEditScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final Client modClient;
+  late Client savedClient;
+  late final ValueNotifier<bool> avatarNotifier;
 
   @override
   void initState() {
+    modClient = Client.from(widget.client);
+    savedClient = Client.from(widget.client);
+    avatarNotifier = ValueNotifier(true);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    avatarNotifier.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,15 +53,57 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
       child: Scaffold(
         appBar: BackAppBar(
           title: 'Клиент',
-          onPressed: () {
+          onExit: () {
+            print(savedClient.id == modClient.id);
+            print(savedClient.avatarPath == modClient.avatarPath);
+            print(savedClient.name == modClient.name);
+            print(savedClient.city == modClient.city);
+            print(savedClient.address == modClient.address);
+            print(savedClient.phone == modClient.phone);
+            print(savedClient.volume == modClient.volume);
+            print(savedClient.previousDate == modClient.previousDate);
+            print(savedClient.nextDate == modClient.nextDate);
+            print(savedClient.images == modClient.images);
+            print(savedClient.comment == modClient.comment);
+            print('images: ${widget.client.images}');
+            print('images: ${modClient.images}');
+            if (modClient != savedClient) {
+              showNoYesAlertDialog(
+                context: context,
+                title: 'Выйти?',
+                description: 'Несохраненные изменения будут утеряны!',
+                lBtnText: 'Отмена',
+                rBtnText: 'Выйти',
+                lBtnPressed: () {
+                  Navigator.of(context).pop();
+                },
+                rBtnPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              );
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
+          onSave: () {
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
-              if (widget.client.id != null) {
-                clientBloc.add(ClientUpdateEvent(widget.client));
+              savedClient = Client.from(modClient);
+              if (modClient.id != null) {
+                clientBloc.add(ClientUpdateEvent(savedClient));
               } else {
-                clientBloc.add(ClientAddEvent(widget.client));
+                clientBloc.add(ClientAddEvent(savedClient));
               }
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(
+                  showInfoSnackBar(
+                    context: context,
+                    info: 'Сохранено!',
+                  ),
+                );
             }
           },
         ),
@@ -64,16 +119,37 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     child: CircleAvatar(
                       backgroundColor: theme.primaryColor,
                       radius: 46,
-                      child: CircleAvatar(
-                        backgroundColor: theme.scaffoldBackgroundColor,
-                        radius: 45,
-                        child: Text(
-                          widget.client.name.isNotEmpty
-                              ? widget.client.name[0]
-                              : '?',
-                          style: theme.textTheme.headline3!
-                              .copyWith(color: theme.primaryColor),
-                        ),
+                      child: ValueListenableBuilder(
+                        valueListenable: avatarNotifier,
+                        builder: (context, _, __) {
+                          // TODO: image blinks when alert dialog shows up
+                          return FutureBuilder(
+                            future:
+                                ImageService.loadImage(modClient.avatarPath),
+                            builder: (context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData &&
+                                  snapshot.data!.isNotEmpty) {
+                                return CircleAvatar(
+                                  backgroundColor:
+                                      theme.scaffoldBackgroundColor,
+                                  radius: 45,
+                                  foregroundImage: MemoryImage(snapshot.data),
+                                );
+                              }
+                              return CircleAvatar(
+                                backgroundColor: theme.scaffoldBackgroundColor,
+                                radius: 45,
+                                child: Text(
+                                  modClient.name.isNotEmpty
+                                      ? modClient.name[0]
+                                      : '?',
+                                  style: theme.textTheme.headline3!
+                                      .copyWith(color: theme.primaryColor),
+                                ),
+                              );
+                            },
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -103,7 +179,13 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                               ),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            String path = await ImageService.pickImage();
+                            if (path.isNotEmpty) {
+                              modClient.avatarPath = path;
+                              avatarNotifier.value = !avatarNotifier.value;
+                            }
+                          },
                         ),
                       ),
                       SizedBox(
@@ -129,7 +211,10 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                               ),
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            modClient.avatarPath = '';
+                            avatarNotifier.value = !avatarNotifier.value;
+                          },
                         ),
                       ),
                     ],
@@ -165,60 +250,78 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                   ),
                   PaddingTextFormField(
                     title: 'Имя',
-                    value: widget.client.name,
+                    value: modClient.name,
+                    onChanged: (String value) {
+                      modClient.name = value;
+                    },
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
                         return 'Заполните поле';
                       }
                     },
                     onSave: (String? value) {
-                      widget.client.name = value ?? '';
+                      modClient.name = value ?? '';
                     },
                   ),
                   PaddingTextFormField(
                     title: 'Телефон',
-                    value: widget.client.phone,
+                    value: modClient.phone,
                     isPhoneNumber: true,
                     keyboardType: TextInputType.number,
+                    onChanged: (String value) {
+                      modClient.phone = value;
+                    },
                     onSave: (String? value) {
-                      widget.client.phone = value ?? '';
+                      modClient.phone = value ?? '';
                     },
                   ),
                   PaddingTextFormField(
                     title: 'Город',
-                    value: widget.client.city,
+                    value: modClient.city,
+                    onChanged: (String value) {
+                      modClient.city = value;
+                    },
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
                         return 'Заполните поле';
                       }
                     },
                     onSave: (String? value) {
-                      widget.client.city = value ?? '';
+                      modClient.city = value ?? '';
                     },
                   ),
                   PaddingTextFormField(
                     title: 'Адрес',
-                    value: widget.client.address,
+                    value: modClient.address,
+                    onChanged: (String value) {
+                      modClient.address = value;
+                    },
                     onSave: (String? value) {
-                      widget.client.address = value ?? '';
+                      modClient.address = value ?? '';
                     },
                   ),
                   PaddingTextFormField(
                     title: 'Объем аквариума',
-                    value: widget.client.volume,
+                    value: modClient.volume,
+                    onChanged: (String value) {
+                      modClient.volume = value;
+                    },
                     onSave: (String? value) {
-                      widget.client.volume = value ?? '';
+                      modClient.volume = value ?? '';
                     },
                   ),
                   SizedBox(
                     height: 300,
                     child: PaddingTextFormField(
                       title: 'Комментарий',
-                      value: widget.client.comment,
+                      value: modClient.comment,
                       keyboardType: TextInputType.multiline,
                       expands: true,
+                      onChanged: (String value) {
+                        modClient.comment = value;
+                      },
                       onSave: (String? value) {
-                        widget.client.comment = value ?? '';
+                        modClient.comment = value ?? '';
                       },
                     ),
                   ),
@@ -245,36 +348,38 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       ),
                     ),
                   ),
-                  Builder(
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-                        child: WideButton(
-                          isPositive: false,
-                          title: 'Удалить',
-                          onPressed: () {
-                            showAskBottomSheet(
-                              context: context,
-                              title: 'Вы действительно хотите удалить клиента?',
-                              text1: 'Отмена',
-                              text2: 'Удалить',
-                              onPressed1: () {
-                                Navigator.pop(context);
-                              },
-                              onPressed2: () {
-                                if (widget.client.id != null) {
-                                  clientBloc
-                                      .add(ClientDeleteEvent(widget.client));
-                                }
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+                  if (modClient.id != null)
+                    Builder(
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                          child: WideButton(
+                            isPositive: false,
+                            title: 'Удалить',
+                            onPressed: () {
+                              showAskBottomSheet(
+                                context: context,
+                                title:
+                                    'Вы действительно хотите удалить клиента?',
+                                text1: 'Отмена',
+                                text2: 'Удалить',
+                                onPressed1: () {
+                                  Navigator.pop(context);
+                                },
+                                onPressed2: () {
+                                  if (modClient.id != null) {
+                                    clientBloc
+                                        .add(ClientDeleteEvent(modClient));
+                                  }
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                },
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
                 ],
               ),
             ),

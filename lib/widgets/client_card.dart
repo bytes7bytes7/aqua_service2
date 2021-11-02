@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:client_repository/client_repository.dart';
 
+import '../services/image_service.dart';
 import '../constants/tooltips.dart' as constant_tooltips;
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/routes.dart' as constant_routes;
@@ -22,15 +23,27 @@ class ClientCard extends StatelessWidget {
         backgroundColor: theme.primaryColor,
         child: Padding(
           padding: const EdgeInsets.all(1.0),
-          child: CircleAvatar(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            child: Text(
-              client.name.isNotEmpty ? client.name[0] : '?',
-              style: theme.textTheme.headline2!.copyWith(
-                fontWeight: FontWeight.normal,
-                color: theme.primaryColor,
-              ),
-            ),
+          child: FutureBuilder(
+            future: ImageService.loadImage(client.avatarPath),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                return CircleAvatar(
+                  backgroundColor: theme.scaffoldBackgroundColor,
+                  radius: 45,
+                  foregroundImage: MemoryImage(snapshot.data),
+                );
+              }
+              return CircleAvatar(
+                backgroundColor: theme.scaffoldBackgroundColor,
+                child: Text(
+                  client.name.isNotEmpty ? client.name[0] : '?',
+                  style: theme.textTheme.headline2!.copyWith(
+                    fontWeight: FontWeight.normal,
+                    color: theme.primaryColor,
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),

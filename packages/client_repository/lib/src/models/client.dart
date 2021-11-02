@@ -1,4 +1,5 @@
-import 'package:client_repository/src/entities/client_entity.dart';
+import 'package:collection/collection.dart';
+import '../entities/client_entity.dart';
 
 class Client {
   Client({
@@ -36,6 +37,19 @@ class Client {
   List<String> images;
   String comment;
 
+  Client.from(Client other)
+      : id = other.id,
+        avatarPath = other.avatarPath,
+        name = other.name,
+        city = other.city,
+        address = other.address,
+        phone = other.phone,
+        volume = other.volume,
+        previousDate = other.previousDate,
+        nextDate = other.nextDate,
+        images = List.from(other.images),
+        comment = other.comment;
+
   @override
   int get hashCode {
     return id.hashCode ^
@@ -64,7 +78,7 @@ class Client {
             volume == other.volume &&
             previousDate == other.previousDate &&
             nextDate == other.nextDate &&
-            images == other.images &&
+            const ListEquality().equals(images, other.images) &&
             comment == other.comment;
   }
 

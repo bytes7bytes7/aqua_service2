@@ -91,7 +91,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
       child: Scaffold(
         appBar: BackAppBar(
           title: 'Материал',
-          onPressed: () {
+          onSave: () {
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
@@ -100,94 +100,95 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
               } else {
                 fabricBloc.add(FabricAddEvent(widget.fabric));
               }
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(
+                  showInfoSnackBar(
+                    context: context,
+                    info: 'Сохранено!',
+                  ),
+                );
             }
           },
         ),
         body: SingleChildScrollView(
           physics: const AlwaysBouncingScrollPhysics(),
-          child: Center(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  PaddingTextFormField(
-                    title: 'Название',
-                    value: widget.fabric.title,
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Заполните поле';
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                PaddingTextFormField(
+                  title: 'Название',
+                  value: widget.fabric.title,
+                  validator: (String? value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Заполните поле';
+                    }
+                  },
+                  onSave: (String? value) {
+                    widget.fabric.title = value ?? '';
+                  },
+                ),
+                PaddingTextFormField(
+                  title: 'Розничная цена',
+                  value: retailPriceNotifier.value,
+                  keyboardType: TextInputType.number,
+                  validator: (String? value) {
+                    value = value?.replaceAll(',', '.');
+                    if (value != null) {
+                      try {
+                        double.parse(value);
+                      } catch (e) {
+                        return 'Не число';
                       }
-                    },
-                    onSave: (String? value) {
-                      widget.fabric.title = value ?? '';
-                    },
-                  ),
-                  PaddingTextFormField(
-                    title: 'Розничная цена',
-                    value: retailPriceNotifier.value,
-                    keyboardType: TextInputType.number,
-                    validator: (String? value) {
-                      value = value?.replaceAll(',', '.');
-                      if (value != null) {
-                        try {
-                          double.parse(value);
-                        } catch (e) {
-                          return 'Не число';
-                        }
+                    }
+                  },
+                  onSave: (String? value) {
+                    if (value != null) {
+                      widget.fabric.retailPrice = double.parse(
+                          retailPriceNotifier.value.replaceAll(',', '.'));
+                    } else {
+                      widget.fabric.retailPrice = 0.0;
+                    }
+                  },
+                  onChanged: (String value) {
+                    retailPriceNotifier.value = value;
+                    calcProfit();
+                  },
+                ),
+                PaddingTextFormField(
+                  title: 'Закупочная цена',
+                  value: purchasePriceNotifier.value,
+                  keyboardType: TextInputType.number,
+                  validator: (String? value) {
+                    value = value?.replaceAll(',', '.');
+                    if (value != null) {
+                      try {
+                        double.parse(value);
+                      } catch (e) {
+                        return 'Не число';
                       }
-                    },
-                    onSave: (String? value) {
-                      if (value != null) {
-                        widget.fabric.retailPrice = double.parse(
-                            retailPriceNotifier.value.replaceAll(',', '.'));
-                      } else {
-                        widget.fabric.retailPrice = 0.0;
-                      }
-                    },
-                    onChanged: (String? value) {
-                      if (value == null) {
-                        retailPriceNotifier.value = '';
-                      } else {
-                        retailPriceNotifier.value = value;
-                      }
-                      calcProfit();
-                    },
-                  ),
-                  PaddingTextFormField(
-                    title: 'Закупочная цена',
-                    value: purchasePriceNotifier.value,
-                    keyboardType: TextInputType.number,
-                    validator: (String? value) {
-                      value = value?.replaceAll(',', '.');
-                      if (value != null) {
-                        try {
-                          double.parse(value);
-                        } catch (e) {
-                          return 'Не число';
-                        }
-                      }
-                    },
-                    onSave: (String? value) {
-                      if (value != null) {
-                        widget.fabric.purchasePrice = double.parse(
-                            purchasePriceNotifier.value.replaceAll(',', '.'));
-                      } else {
-                        widget.fabric.purchasePrice = 0.0;
-                      }
-                    },
-                    onChanged: (String? value) {
-                      if (value == null) {
-                        purchasePriceNotifier.value = '';
-                      } else {
-                        purchasePriceNotifier.value = value;
-                      }
-                      calcProfit();
-                    },
-                  ),
-                  PaddingTextFieldNotifier(
-                    title: 'Прибыль',
-                    notifier: profitNotifier,
-                  ),
+                    }
+                  },
+                  onSave: (String? value) {
+                    if (value != null) {
+                      widget.fabric.purchasePrice = double.parse(
+                          purchasePriceNotifier.value.replaceAll(',', '.'));
+                    } else {
+                      widget.fabric.purchasePrice = 0.0;
+                    }
+                  },
+                  onChanged: (String value) {
+                    purchasePriceNotifier.value = value;
+                    calcProfit();
+                  },
+                ),
+                PaddingTextFieldNotifier(
+                  title: 'Прибыль',
+                  notifier: profitNotifier,
+                ),
+                // TODO: find a way how to place this button at the bottom
+                if (widget.fabric.id != null)
                   Builder(
                     builder: (context) {
                       return Padding(
@@ -219,8 +220,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                       );
                     },
                   ),
-                ],
-              ),
+              ],
             ),
           ),
         ),
