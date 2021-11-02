@@ -41,36 +41,40 @@ class AppDrawer extends StatelessWidget {
             [null],
             [Icons.settings, 'Настройки', constant_routes.settings],
             [Icons.info, 'О приложении', constant_routes.about],
-          ].map((entity) {
-            if (entity[0] == null) {
-              return Divider(
-                color: theme.disabledColor,
-                thickness: 1,
-                height: 1,
-              );
-            }
+          ].map(
+            (entity) {
+              if (entity[0] == null) {
+                return Divider(
+                  color: theme.disabledColor,
+                  thickness: 1,
+                  height: 1,
+                );
+              }
 
-            IconData icon = entity[0] as IconData;
-            String title = entity[1] as String;
-            String route = entity[2] as String;
-            return ListTile(
-              horizontalTitleGap: 5,
-              dense: true,
-              leading: Icon(
-                icon,
-                color: theme.disabledColor,
-              ),
-              title: Text(
-                title,
-                style: theme.textTheme.bodyText1,
-              ),
-              onTap: () {
-                // popUntil -> route that doesn't exist
-                Navigator.popUntil(context, (route) => route.settings.name == '/');
-                Navigator.of(context).pushNamed(route);
-              },
-            );
-          }),
+              IconData icon = entity[0] as IconData;
+              String title = entity[1] as String;
+              String route = entity[2] as String;
+              return ListTile(
+                horizontalTitleGap: 5,
+                dense: true,
+                leading: Icon(
+                  icon,
+                  color: theme.disabledColor,
+                ),
+                title: Text(
+                  title,
+                  style: theme.textTheme.bodyText1,
+                ),
+                onTap: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  // popUntil -> route that doesn't exist
+                  Navigator.popUntil(
+                      context, (route) => route.settings.name == '/');
+                  Navigator.of(context).pushNamed(route);
+                },
+              );
+            },
+          ),
         ],
       ),
     );

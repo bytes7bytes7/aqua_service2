@@ -23,6 +23,12 @@ class Fabric {
         purchasePrice.hashCode;
   }
 
+  Fabric.from(Fabric other)
+      : id = other.id,
+        title = other.title,
+        retailPrice = other.retailPrice,
+        purchasePrice = other.purchasePrice;
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/wide_button.dart';
+import 'wide_button.dart';
 
 void showAskBottomSheet({
   required BuildContext context,

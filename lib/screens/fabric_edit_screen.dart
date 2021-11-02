@@ -5,7 +5,7 @@ import 'package:fabric_repository/fabric_repository.dart';
 import '../services/number_format_service.dart' as number_format_service;
 import '../blocs/blocs.dart';
 import '../custom/always_bouncing_scroll_physics.dart';
-import '../global/show_ask_bottom_sheet.dart';
+import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
 
 class FabricEditScreen extends StatefulWidget {
@@ -21,19 +21,19 @@ class FabricEditScreen extends StatefulWidget {
 }
 
 class _FabricEditScreenState extends State<FabricEditScreen> {
+  late final ValueNotifier<bool> isCreated;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final ValueNotifier<String> retailPriceNotifier;
-  late final ValueNotifier<String> purchasePriceNotifier;
   late final ValueNotifier<String> profitNotifier;
+  late final Fabric modFabric;
+  late Fabric savedFabric;
 
   @override
   void initState() {
-    retailPriceNotifier = ValueNotifier(number_format_service
-        .getRidOfZero(widget.fabric.retailPrice.toString()));
-    purchasePriceNotifier = ValueNotifier(number_format_service
-        .getRidOfZero(widget.fabric.purchasePrice.toString()));
+    isCreated = ValueNotifier(widget.fabric.id != null);
     profitNotifier = ValueNotifier(number_format_service.getRidOfZero(
         (widget.fabric.retailPrice - widget.fabric.purchasePrice).toString()));
+    modFabric = Fabric.from(widget.fabric);
+    savedFabric = Fabric.from(widget.fabric);
     super.initState();
   }
 
@@ -42,13 +42,9 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
     final fabricBloc = context.read<FabricBloc>();
 
     void calcProfit() {
-      if (retailPriceNotifier.value.isEmpty &&
-          purchasePriceNotifier.value.isEmpty) {
-        profitNotifier.value = '0';
-      } else if (retailPriceNotifier.value.isEmpty) {
+      if (modFabric.retailPrice == 0) {
         try {
-          double value =
-              double.parse(purchasePriceNotifier.value.replaceAll(',', '.'));
+          double value = modFabric.purchasePrice;
           if (value != 0) {
             profitNotifier.value = (-(value.abs())).toString();
           } else {
@@ -57,22 +53,10 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
         } catch (e) {
           profitNotifier.value = '?';
         }
-      } else if (purchasePriceNotifier.value.isEmpty) {
-        try {
-          profitNotifier.value =
-              double.parse(retailPriceNotifier.value.replaceAll(',', '.'))
-                  .abs()
-                  .toString();
-        } catch (e) {
-          profitNotifier.value = '?';
-        }
       } else {
         try {
           profitNotifier.value =
-              (double.parse(retailPriceNotifier.value.replaceAll(',', '.')) -
-                      double.parse(
-                          purchasePriceNotifier.value.replaceAll(',', '.')))
-                  .toString();
+              (modFabric.retailPrice - modFabric.purchasePrice).toString();
         } catch (e) {
           profitNotifier.value = '?';
         }
@@ -91,14 +75,36 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
       child: Scaffold(
         appBar: BackAppBar(
           title: 'Материал',
+          onExit: () {
+            modFabric.id ??= savedFabric.id;
+            if (modFabric != savedFabric) {
+              showAskBottomSheet(
+                context: context,
+                title: 'Выйти?\nИзменения будут утеряны!',
+                text1: 'Отмена',
+                text2: 'Выйти',
+                onPressed1: () {
+                  Navigator.of(context).pop();
+                },
+                onPressed2: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              );
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
           onSave: () {
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
-              if (widget.fabric.id != null) {
-                fabricBloc.add(FabricUpdateEvent(widget.fabric));
+              savedFabric = Fabric.from(modFabric);
+              if (savedFabric.id != null) {
+                fabricBloc.add(FabricUpdateEvent(savedFabric));
               } else {
-                fabricBloc.add(FabricAddEvent(widget.fabric));
+                isCreated.value = true;
+                fabricBloc.add(FabricAddEvent(savedFabric));
               }
               ScaffoldMessenger.of(context)
                 ..removeCurrentSnackBar()
@@ -119,20 +125,30 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
               children: [
                 PaddingTextFormField(
                   title: 'Название',
-                  value: widget.fabric.title,
+                  value: modFabric.title,
+                  onChanged: (String value) {
+                    modFabric.title = value;
+                  },
                   validator: (String? value) {
                     if (value == null || value.isEmpty) {
                       return 'Заполните поле';
                     }
                   },
-                  onSave: (String? value) {
-                    widget.fabric.title = value ?? '';
-                  },
                 ),
                 PaddingTextFormField(
                   title: 'Розничная цена',
-                  value: retailPriceNotifier.value,
+                  value: number_format_service
+                      .getRidOfZero(modFabric.retailPrice.toString()),
                   keyboardType: TextInputType.number,
+                  onChanged: (String value) {
+                    try {
+                      modFabric.retailPrice =
+                          double.parse(value.replaceAll(',', '.'));
+                    } catch (e) {
+                      modFabric.retailPrice = 0.0;
+                    }
+                    calcProfit();
+                  },
                   validator: (String? value) {
                     value = value?.replaceAll(',', '.');
                     if (value != null) {
@@ -142,24 +158,22 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                         return 'Не число';
                       }
                     }
-                  },
-                  onSave: (String? value) {
-                    if (value != null) {
-                      widget.fabric.retailPrice = double.parse(
-                          retailPriceNotifier.value.replaceAll(',', '.'));
-                    } else {
-                      widget.fabric.retailPrice = 0.0;
-                    }
-                  },
-                  onChanged: (String value) {
-                    retailPriceNotifier.value = value;
-                    calcProfit();
                   },
                 ),
                 PaddingTextFormField(
                   title: 'Закупочная цена',
-                  value: purchasePriceNotifier.value,
+                  value: number_format_service
+                      .getRidOfZero(modFabric.purchasePrice.toString()),
                   keyboardType: TextInputType.number,
+                  onChanged: (String value) {
+                    try {
+                      modFabric.purchasePrice =
+                          double.parse(value.replaceAll(',', '.'));
+                    } catch (e) {
+                      modFabric.purchasePrice = 0.0;
+                    }
+                    calcProfit();
+                  },
                   validator: (String? value) {
                     value = value?.replaceAll(',', '.');
                     if (value != null) {
@@ -169,18 +183,6 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                         return 'Не число';
                       }
                     }
-                  },
-                  onSave: (String? value) {
-                    if (value != null) {
-                      widget.fabric.purchasePrice = double.parse(
-                          purchasePriceNotifier.value.replaceAll(',', '.'));
-                    } else {
-                      widget.fabric.purchasePrice = 0.0;
-                    }
-                  },
-                  onChanged: (String value) {
-                    purchasePriceNotifier.value = value;
-                    calcProfit();
                   },
                 ),
                 PaddingTextFieldNotifier(
@@ -188,38 +190,40 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                   notifier: profitNotifier,
                 ),
                 // TODO: find a way how to place this button at the bottom
-                if (widget.fabric.id != null)
-                  Builder(
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-                        child: WideButton(
-                          isPositive: false,
-                          title: 'Удалить',
-                          onPressed: () {
-                            showAskBottomSheet(
-                              context: context,
-                              title:
-                                  'Вы действительно хотите удалить материал?',
-                              text1: 'Отмена',
-                              text2: 'Удалить',
-                              onPressed1: () {
-                                Navigator.pop(context);
-                              },
-                              onPressed2: () {
-                                if (widget.fabric.id != null) {
-                                  fabricBloc
-                                      .add(FabricDeleteEvent(widget.fabric));
-                                }
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                              },
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
+                ValueListenableBuilder(
+                  valueListenable: isCreated,
+                  builder: (context, bool value, _) {
+                    if(!value){
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                      child: WideButton(
+                        isPositive: false,
+                        title: 'Удалить',
+                        onPressed: () {
+                          showAskBottomSheet(
+                            context: context,
+                            title:
+                            'Вы действительно хотите удалить материал?',
+                            text1: 'Отмена',
+                            text2: 'Удалить',
+                            onPressed1: () {
+                              Navigator.pop(context);
+                            },
+                            onPressed2: () {
+                              if (savedFabric.id != null) {
+                                fabricBloc.add(FabricDeleteEvent(savedFabric));
+                              }
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
               ],
             ),
           ),

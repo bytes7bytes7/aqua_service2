@@ -5,7 +5,6 @@ import '../constants/sizes.dart' as constant_sizes;
 import '../constants/tooltips.dart' as constant_tooltips;
 
 typedef VoidStringCallBack = void Function(String);
-typedef VoidStringNullCallback = void Function(String?);
 typedef ValidatorCallback = String? Function(String?);
 
 class PaddingTextFormField extends StatefulWidget {
@@ -13,7 +12,6 @@ class PaddingTextFormField extends StatefulWidget {
     Key? key,
     required this.title,
     required this.value,
-    required this.onSave,
     this.validator,
     this.onChanged,
     this.isPhoneNumber = false,
@@ -23,7 +21,6 @@ class PaddingTextFormField extends StatefulWidget {
 
   final String title;
   final String? value;
-  final VoidStringNullCallback onSave;
   final ValidatorCallback? validator;
   final VoidStringCallBack? onChanged;
   final bool isPhoneNumber;
@@ -62,7 +59,6 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
         expands: widget.expands,
         maxLines: widget.expands ? null : 1,
         keyboardType: widget.keyboardType,
-        onSaved: widget.onSave,
         validator: widget.validator,
         onChanged: widget.onChanged,
         decoration: InputDecoration(

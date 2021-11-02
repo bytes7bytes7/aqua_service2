@@ -5,7 +5,7 @@ import 'package:client_repository/client_repository.dart';
 import '../services/image_service.dart';
 import '../blocs/blocs.dart';
 import '../custom/always_bouncing_scroll_physics.dart';
-import '../global/show_ask_bottom_sheet.dart';
+import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
 
 class ClientEditScreen extends StatefulWidget {
@@ -21,6 +21,7 @@ class ClientEditScreen extends StatefulWidget {
 }
 
 class _ClientEditScreenState extends State<ClientEditScreen> {
+  late final ValueNotifier<bool> isCreated;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final Client modClient;
   late Client savedClient;
@@ -28,6 +29,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
 
   @override
   void initState() {
+    isCreated = ValueNotifier(widget.client.id != null);
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
     avatarNotifier = ValueNotifier(true);
@@ -54,30 +56,17 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
         appBar: BackAppBar(
           title: 'Клиент',
           onExit: () {
-            print(savedClient.id == modClient.id);
-            print(savedClient.avatarPath == modClient.avatarPath);
-            print(savedClient.name == modClient.name);
-            print(savedClient.city == modClient.city);
-            print(savedClient.address == modClient.address);
-            print(savedClient.phone == modClient.phone);
-            print(savedClient.volume == modClient.volume);
-            print(savedClient.previousDate == modClient.previousDate);
-            print(savedClient.nextDate == modClient.nextDate);
-            print(savedClient.images == modClient.images);
-            print(savedClient.comment == modClient.comment);
-            print('images: ${widget.client.images}');
-            print('images: ${modClient.images}');
+            modClient.id ??= savedClient.id;
             if (modClient != savedClient) {
-              showNoYesAlertDialog(
+              showAskBottomSheet(
                 context: context,
-                title: 'Выйти?',
-                description: 'Несохраненные изменения будут утеряны!',
-                lBtnText: 'Отмена',
-                rBtnText: 'Выйти',
-                lBtnPressed: () {
+                title: 'Выйти?\nИзменения будут утеряны!',
+                text1: 'Отмена',
+                text2: 'Выйти',
+                onPressed1: () {
                   Navigator.of(context).pop();
                 },
-                rBtnPressed: () {
+                onPressed2: () {
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
@@ -94,6 +83,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
               if (modClient.id != null) {
                 clientBloc.add(ClientUpdateEvent(savedClient));
               } else {
+                isCreated.value = true;
                 clientBloc.add(ClientAddEvent(savedClient));
               }
               ScaffoldMessenger.of(context)
@@ -259,9 +249,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                         return 'Заполните поле';
                       }
                     },
-                    onSave: (String? value) {
-                      modClient.name = value ?? '';
-                    },
                   ),
                   PaddingTextFormField(
                     title: 'Телефон',
@@ -270,9 +257,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     keyboardType: TextInputType.number,
                     onChanged: (String value) {
                       modClient.phone = value;
-                    },
-                    onSave: (String? value) {
-                      modClient.phone = value ?? '';
                     },
                   ),
                   PaddingTextFormField(
@@ -286,9 +270,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                         return 'Заполните поле';
                       }
                     },
-                    onSave: (String? value) {
-                      modClient.city = value ?? '';
-                    },
                   ),
                   PaddingTextFormField(
                     title: 'Адрес',
@@ -296,18 +277,12 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     onChanged: (String value) {
                       modClient.address = value;
                     },
-                    onSave: (String? value) {
-                      modClient.address = value ?? '';
-                    },
                   ),
                   PaddingTextFormField(
                     title: 'Объем аквариума',
                     value: modClient.volume,
                     onChanged: (String value) {
                       modClient.volume = value;
-                    },
-                    onSave: (String? value) {
-                      modClient.volume = value ?? '';
                     },
                   ),
                   SizedBox(
@@ -319,9 +294,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       expands: true,
                       onChanged: (String value) {
                         modClient.comment = value;
-                      },
-                      onSave: (String? value) {
-                        modClient.comment = value ?? '';
                       },
                     ),
                   ),
@@ -348,38 +320,40 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       ),
                     ),
                   ),
-                  if (modClient.id != null)
-                    Builder(
-                      builder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
-                          child: WideButton(
-                            isPositive: false,
-                            title: 'Удалить',
-                            onPressed: () {
-                              showAskBottomSheet(
-                                context: context,
-                                title:
-                                    'Вы действительно хотите удалить клиента?',
-                                text1: 'Отмена',
-                                text2: 'Удалить',
-                                onPressed1: () {
-                                  Navigator.pop(context);
-                                },
-                                onPressed2: () {
-                                  if (modClient.id != null) {
-                                    clientBloc
-                                        .add(ClientDeleteEvent(modClient));
-                                  }
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                },
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                  ValueListenableBuilder(
+                    valueListenable: isCreated,
+                    builder: (context, bool value, _) {
+                      if (!value) {
+                        return const SizedBox.shrink();
+                      }
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                        child: WideButton(
+                          isPositive: false,
+                          title: 'Удалить',
+                          onPressed: () {
+                            showAskBottomSheet(
+                              context: context,
+                              title: 'Вы действительно хотите удалить клиента?',
+                              text1: 'Отмена',
+                              text2: 'Удалить',
+                              onPressed1: () {
+                                Navigator.pop(context);
+                              },
+                              onPressed2: () {
+                                if (savedClient.id != null) {
+                                  clientBloc
+                                      .add(ClientDeleteEvent(savedClient));
+                                }
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
