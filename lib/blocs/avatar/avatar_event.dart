@@ -17,7 +17,7 @@ class AvatarLoadEvent extends AvatarEvent {
 
   @override
   String toString() {
-    return 'AvatarLoadEvent {path : $path}';
+    return 'AvatarLoadEvent {path: $path}';
   }
 }
 

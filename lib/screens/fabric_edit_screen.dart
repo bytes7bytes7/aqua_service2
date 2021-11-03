@@ -195,6 +195,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                   title: 'Прибыль',
                   notifier: profitNotifier,
                 ),
+                const SizedBox(height: 30.0),
                 // TODO: find a way how to place this button at the bottom
                 ValueListenableBuilder(
                   valueListenable: isCreated,
@@ -203,7 +204,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                       return const SizedBox.shrink();
                     }
                     return Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                       child: WideButton(
                         isPositive: false,
                         title: 'Удалить',

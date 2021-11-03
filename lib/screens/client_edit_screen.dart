@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
-import '../services/image_service.dart';
 import '../blocs/blocs.dart';
 import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
@@ -25,21 +24,18 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final Client modClient;
   late Client savedClient;
-  late final ValueNotifier<bool> imageNotifier;
 
   @override
   void initState() {
     isCreated = ValueNotifier(widget.client.id != null);
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
-    imageNotifier = ValueNotifier(true);
     super.initState();
   }
 
   @override
   void dispose() {
     isCreated.dispose();
-    imageNotifier.dispose();
     super.dispose();
   }
 
@@ -49,6 +45,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     final size = MediaQuery.of(context).size;
     final clientBloc = context.read<ClientBloc>();
     final avatarBloc = context.read<AvatarBloc>();
+    final galleryBloc = context.read<GalleryBloc>();
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -136,9 +133,9 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                               foregroundImage: MemoryImage(state.avatar),
                             );
                           } else {
+                            // TODO: try AvatarErrorState
                             return CircleAvatar(
-                              backgroundColor:
-                                  theme.errorColor.withOpacity(0.5),
+                              backgroundColor: theme.scaffoldBackgroundColor,
                               radius: 45,
                               child: Icon(
                                 Icons.warning_amber_outlined,
@@ -254,12 +251,12 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       children: [
                         // TODO: add next & previous dates
                         Text(
-                          'Послед. дата: ' + widget.client.previousDate,
+                          'Послед. дата: ' + modClient.previousDate,
                           style: theme.textTheme.bodyText1,
                         ),
                         const SizedBox(height: 16.0),
                         Text(
-                          'След. дата: ' + widget.client.nextDate,
+                          'След. дата: ' + modClient.nextDate,
                           style: theme.textTheme.bodyText1,
                         ),
                       ],
@@ -324,112 +321,126 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                       },
                     ),
                   ),
-                  ValueListenableBuilder(
-                    valueListenable: imageNotifier,
-                    builder: (context, _, __) {
-                      return Container(
-                        height: 200,
-                        padding: const EdgeInsets.only(top: 30.0),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: List.generate(
-                              modClient.images.length + 1,
-                              (index) {
-                                if (index == modClient.images.length) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                      left: 0,
-                                      right: 20.0,
-                                    ),
-                                    width: size.width * 0.7,
-                                    child: OutlinedButton(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add_photo_alternate,
-                                            color: theme.shadowColor,
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Text(
-                                            'Добавить фото',
-                                            style: theme.textTheme.subtitle1,
-                                          )
-                                        ],
+                  Container(
+                    height: 230,
+                    padding: const EdgeInsets.symmetric(vertical: 30.0),
+                    child: BlocBuilder<GalleryBloc, GalleryState>(
+                      builder: (BuildContext context, GalleryState state) {
+                        if (state is GalleryLoadingState) {
+                          return const SizedBox.shrink();
+                        } else if (state is GalleryDataState) {
+                          modClient.images.clear();
+                          modClient.images.addAll(state.path);
+                          return SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              children: List.generate(
+                                state.gallery.length + 1,
+                                (index) {
+                                  if (index == state.gallery.length) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(
+                                        left: 0,
+                                        right: 20.0,
                                       ),
-                                      style: OutlinedButton.styleFrom(
-                                        primary: theme.primaryColor,
-                                        side: BorderSide(
-                                          color: theme.disabledColor,
+                                      width: size.width * 0.7,
+                                      child: OutlinedButton(
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.add_photo_alternate,
+                                              color: theme.shadowColor,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Добавить фото',
+                                              style: theme.textTheme.subtitle1,
+                                            )
+                                          ],
                                         ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        String path =
-                                            await ImageService.pickImage();
-                                        if (path.isNotEmpty) {
-                                          modClient.images.add(path);
-                                          imageNotifier.value =
-                                              !imageNotifier.value;
-                                        }
-                                      },
-                                    ),
-                                  );
-                                }
-                                return FutureBuilder(
-                                  future: ImageService.loadImage(
-                                      modClient.images[index]),
-                                  builder: (context, AsyncSnapshot snapshot) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).pushNamed(
-                                          constant_routes.gallery,
-                                          arguments: {
-                                            'images': modClient.images,
-                                            'index': index,
-                                            'onDelete': () {},
-                                            'onAdd': () {},
-                                          },
-                                        );
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                          left: index == 0 ? 20.0 : 0,
-                                          right: 20.0,
-                                        ),
-                                        width: size.width * 0.7,
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20.0),
-                                          border: Border.all(
+                                        style: OutlinedButton.styleFrom(
+                                          primary: theme.primaryColor,
+                                          side: BorderSide(
                                             color: theme.disabledColor,
                                           ),
-                                          color: theme.scaffoldBackgroundColor,
-                                          image: (snapshot.hasData &&
-                                                  snapshot.data.isNotEmpty)
-                                              ? DecorationImage(
-                                                  image: MemoryImage(
-                                                      snapshot.data),
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : null,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                          ),
                                         ),
+                                        onPressed: () async {
+                                          galleryBloc.add(
+                                            GalleryAddEvent(modClient.images),
+                                          );
+                                        },
                                       ),
                                     );
-                                  },
-                                );
-                              },
+                                  }
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                        constant_routes.gallery,
+                                        arguments: {
+                                          'images': modClient.images,
+                                          'index': index,
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                        left: index == 0 ? 20.0 : 0,
+                                        right: 20.0,
+                                      ),
+                                      width: size.width * 0.7,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        border: Border.all(
+                                          color: theme.disabledColor,
+                                        ),
+                                        color: theme.scaffoldBackgroundColor,
+                                        image: DecorationImage(
+                                          image:
+                                              MemoryImage(state.gallery[index]),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
+                          );
+                        } else {
+                          // TODO: try GalleryErrorState
+                          return Container(
+                            margin: const EdgeInsets.only(
+                              left: 0,
+                              right: 20.0,
+                            ),
+                            width: size.width * 0.7,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.warning_amber_outlined,
+                                  color: theme.errorColor,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Ошибка',
+                                  style: theme.textTheme.subtitle1!
+                                      .copyWith(color: theme.errorColor),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                   ValueListenableBuilder(
                     valueListenable: isCreated,
@@ -438,7 +449,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                         return const SizedBox.shrink();
                       }
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 30, 20, 20),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                         child: WideButton(
                           isPositive: false,
                           title: 'Удалить',

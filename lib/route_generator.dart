@@ -18,24 +18,34 @@ class RouteGenerator {
       case constant_routes.clientEdit:
         Client client = args['client'];
         return _up(
-          BlocProvider(
-            create: (context) {
-              return AvatarBloc()..add(AvatarLoadEvent(client.avatarPath));
-            },
+          MultiBlocProvider(
+            providers: [
+              BlocProvider<AvatarBloc>(
+                create: (context) {
+                  return AvatarBloc()..add(AvatarLoadEvent(client.avatarPath));
+                },
+              ),
+              BlocProvider<GalleryBloc>(
+                create: (context) {
+                  return GalleryBloc()..add(GalleryLoadEvent(client.images));
+                },
+              ),
+            ],
             child: ClientEditScreen(client: client),
           ),
         );
       case constant_routes.gallery:
         List<String> images = args['images'];
         int index = args['index'];
-        VoidCallback onAdd = args['onAdd'];
-        VoidCallback onDelete = args['onDelete'];
         return _up(
-          GalleryScreen(
-            images: images,
-            index: index,
-            onAdd: onAdd,
-            onDelete: onDelete,
+          BlocProvider<GalleryBloc>(
+            create: (context) {
+              return GalleryBloc()..add(GalleryLoadEvent(images));
+            },
+            child: GalleryScreen(
+              images: images,
+              index: index,
+            ),
           ),
         );
       case constant_routes.fabrics:
