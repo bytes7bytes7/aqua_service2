@@ -1,5 +1,6 @@
 const String clients = '/clients';
 const String clientEdit = '/client_edit';
+const String gallery = '/gallery';
 const String fabrics = '/fabrics';
 const String fabricEdit = '/fabric_edit';
 const String orders = '/orders';

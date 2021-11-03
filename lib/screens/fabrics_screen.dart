@@ -3,7 +3,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
-import '../custom/always_bouncing_scroll_physics.dart';
 import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
 import '../constants/routes.dart' as constant_routes;
@@ -98,7 +97,7 @@ class __FabricListState extends State<_FabricList> {
       );
     }
     return ListView.separated(
-      physics: const AlwaysBouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.vertical,
       itemCount: widget.items.length,
       separatorBuilder: (context, index) {

@@ -4,9 +4,9 @@ import 'package:client_repository/client_repository.dart';
 
 import '../services/image_service.dart';
 import '../blocs/blocs.dart';
-import '../custom/always_bouncing_scroll_physics.dart';
 import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
+import '../constants/routes.dart' as constant_routes;
 
 class ClientEditScreen extends StatefulWidget {
   const ClientEditScreen({
@@ -102,7 +102,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
           },
         ),
         body: SingleChildScrollView(
-          physics: const AlwaysBouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Center(
             child: Form(
               key: _formKey,
@@ -117,6 +117,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                         valueListenable: avatarNotifier,
                         builder: (context, _, __) {
                           // TODO: image blinks when alert dialog shows up
+                          // TODO: create bloc for images
                           return FutureBuilder(
                             future:
                                 ImageService.loadImage(modClient.avatarPath),
@@ -303,64 +304,81 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     ),
                   ),
                   ValueListenableBuilder(
-                      valueListenable: imageNotifier,
-                      builder: (context, _, __) {
-                        return Container(
-                          height: 200,
-                          padding: const EdgeInsets.only(top: 30.0),
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            physics: const BouncingScrollPhysics(),
-                            child: Row(
-                              children: List.generate(
-                                modClient.images.length + 1,
-                                (index) {
-                                  if (index == modClient.images.length) {
-                                    return SizedBox(
-                                      width: size.width * 0.7,
-                                      child: OutlinedButton(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.add_photo_alternate,
-                                              color: theme.shadowColor,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            Text(
-                                              'Добавить фото',
-                                              style: theme.textTheme.subtitle1,
-                                            )
-                                          ],
-                                        ),
-                                        style: OutlinedButton.styleFrom(
-                                          primary: theme.primaryColor,
-                                          side: BorderSide(
-                                            color: theme.disabledColor,
+                    valueListenable: imageNotifier,
+                    builder: (context, _, __) {
+                      return Container(
+                        height: 200,
+                        padding: const EdgeInsets.only(top: 30.0),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: List.generate(
+                              modClient.images.length + 1,
+                              (index) {
+                                if (index == modClient.images.length) {
+                                  return Container(
+                                    margin: const EdgeInsets.only(
+                                      left: 0,
+                                      right: 20.0,
+                                    ),
+                                    width: size.width * 0.7,
+                                    child: OutlinedButton(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.add_photo_alternate,
+                                            color: theme.shadowColor,
                                           ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20.0),
-                                          ),
-                                        ),
-                                        onPressed: () async {
-                                          String path =
-                                              await ImageService.pickImage();
-                                          if (path.isNotEmpty) {
-                                            modClient.images.add(path);
-                                            imageNotifier.value =
-                                                !imageNotifier.value;
-                                          }
-                                        },
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'Добавить фото',
+                                            style: theme.textTheme.subtitle1,
+                                          )
+                                        ],
                                       ),
-                                    );
-                                  }
-                                  return FutureBuilder(
-                                    future: ImageService.loadImage(
-                                        modClient.images[index]),
-                                    builder: (context, AsyncSnapshot snapshot) {
-                                      return Container(
+                                      style: OutlinedButton.styleFrom(
+                                        primary: theme.primaryColor,
+                                        side: BorderSide(
+                                          color: theme.disabledColor,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        String path =
+                                            await ImageService.pickImage();
+                                        if (path.isNotEmpty) {
+                                          modClient.images.add(path);
+                                          imageNotifier.value =
+                                              !imageNotifier.value;
+                                        }
+                                      },
+                                    ),
+                                  );
+                                }
+                                return FutureBuilder(
+                                  future: ImageService.loadImage(
+                                      modClient.images[index]),
+                                  builder: (context, AsyncSnapshot snapshot) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.of(context).pushNamed(
+                                          constant_routes.gallery,
+                                          arguments: {
+                                            'images' : modClient.images,
+                                            'index': index,
+                                            'onDelete': () {
+                                            },
+                                            'onAdd': () {},
+                                          },
+                                        );
+                                      },
+                                      child: Container(
                                         margin: EdgeInsets.only(
                                           left: index == 0 ? 20.0 : 0,
                                           right: 20.0,
@@ -382,15 +400,17 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                                                 )
                                               : null,
                                         ),
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ),
-                        );
-                      }),
+                        ),
+                      );
+                    },
+                  ),
                   ValueListenableBuilder(
                     valueListenable: isCreated,
                     builder: (context, bool value, _) {

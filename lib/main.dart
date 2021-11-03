@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
-import 'custom/route_generator.dart';
+import 'route_generator.dart';
 import 'themes/light_theme.dart';
 import 'blocs/blocs.dart';
 import 'constants/routes.dart' as constant_routes;

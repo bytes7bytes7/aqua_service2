@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
-import '../screens/screens.dart';
-import '../constants/routes.dart' as constant_routes;
+import 'screens/screens.dart';
+import 'constants/routes.dart' as constant_routes;
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -18,6 +18,19 @@ class RouteGenerator {
         return _up(
           ClientEditScreen(client: client ?? Client()),
         );
+      case constant_routes.gallery:
+        List<String> images = args['images'];
+        int index = args['index'];
+        VoidCallback onAdd = args['onAdd'];
+        VoidCallback onDelete = args['onDelete'];
+        return _up(
+          GalleryScreen(
+            images: images,
+            index: index,
+            onAdd: onAdd,
+            onDelete: onDelete,
+          ),
+        );
       case constant_routes.fabrics:
         return _left(const FabricsScreen());
       case constant_routes.fabricEdit:
@@ -25,6 +38,8 @@ class RouteGenerator {
         return _up(
           FabricEditScreen(fabric: fabric ?? Fabric()),
         );
+      case constant_routes.about:
+        return _left(const AboutScreen());
       default:
         return _left(const NotFoundScreen());
     }

@@ -4,7 +4,6 @@ import 'package:fabric_repository/fabric_repository.dart';
 
 import '../services/number_format_service.dart' as number_format_service;
 import '../blocs/blocs.dart';
-import '../custom/always_bouncing_scroll_physics.dart';
 import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
 
@@ -125,7 +124,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
           },
         ),
         body: SingleChildScrollView(
-          physics: const AlwaysBouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           child: Form(
             key: _formKey,
             child: Column(

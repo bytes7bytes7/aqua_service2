@@ -3,7 +3,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 
-import '../custom/always_bouncing_scroll_physics.dart';
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
 import '../constants/routes.dart' as constant_routes;
@@ -98,7 +97,7 @@ class __ClientListState extends State<_ClientList> {
       );
     }
     return ListView.separated(
-      physics: const AlwaysBouncingScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       scrollDirection: Axis.vertical,
       itemCount: widget.items.length,
       separatorBuilder: (context, index) {

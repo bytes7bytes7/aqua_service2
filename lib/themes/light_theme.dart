@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants/colors.dart' as constant_colors;
 
@@ -26,11 +27,6 @@ ThemeData lightTheme = ThemeData(
     subtitle1: TextStyle(
       fontSize: 15,
       fontWeight: FontWeight.normal,
-      color: constant_colors.shadowColor,
-    ),
-    subtitle2: TextStyle(
-      fontSize: 15,
-      fontWeight: FontWeight.bold,
       color: constant_colors.shadowColor,
     ),
   ),
