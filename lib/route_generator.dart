@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
+import 'blocs/blocs.dart';
 import 'screens/screens.dart';
 import 'constants/routes.dart' as constant_routes;
 
@@ -14,9 +16,14 @@ class RouteGenerator {
       case constant_routes.clients:
         return _left(const ClientsScreen());
       case constant_routes.clientEdit:
-        Client? client = args['client'];
+        Client client = args['client'];
         return _up(
-          ClientEditScreen(client: client ?? Client()),
+          BlocProvider(
+            create: (context) {
+              return AvatarBloc()..add(AvatarLoadEvent(client.avatarPath));
+            },
+            child: ClientEditScreen(client: client),
+          ),
         );
       case constant_routes.gallery:
         List<String> images = args['images'];

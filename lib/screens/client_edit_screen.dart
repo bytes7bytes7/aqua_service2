@@ -25,7 +25,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final Client modClient;
   late Client savedClient;
-  late final ValueNotifier<bool> avatarNotifier;
   late final ValueNotifier<bool> imageNotifier;
 
   @override
@@ -33,7 +32,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     isCreated = ValueNotifier(widget.client.id != null);
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
-    avatarNotifier = ValueNotifier(true);
     imageNotifier = ValueNotifier(true);
     super.initState();
   }
@@ -41,7 +39,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   @override
   void dispose() {
     isCreated.dispose();
-    avatarNotifier.dispose();
     imageNotifier.dispose();
     super.dispose();
   }
@@ -51,6 +48,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     final clientBloc = context.read<ClientBloc>();
+    final avatarBloc = context.read<AvatarBloc>();
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -113,24 +111,13 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                     child: CircleAvatar(
                       backgroundColor: theme.primaryColor,
                       radius: 46,
-                      child: ValueListenableBuilder(
-                        valueListenable: avatarNotifier,
-                        builder: (context, _, __) {
-                          // TODO: image blinks when alert dialog shows up
-                          // TODO: create bloc for images
-                          return FutureBuilder(
-                            future:
-                                ImageService.loadImage(modClient.avatarPath),
-                            builder: (context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData &&
-                                  snapshot.data!.isNotEmpty) {
-                                return CircleAvatar(
-                                  backgroundColor:
-                                      theme.scaffoldBackgroundColor,
-                                  radius: 45,
-                                  foregroundImage: MemoryImage(snapshot.data),
-                                );
-                              }
+                      child: BlocBuilder<AvatarBloc, AvatarState>(
+                        builder: (BuildContext context, AvatarState state) {
+                          if (state is AvatarLoadingState) {
+                            return const SizedBox.shrink();
+                          } else if (state is AvatarDataState) {
+                            modClient.avatarPath = state.path;
+                            if (state.avatar.isEmpty) {
                               return CircleAvatar(
                                 backgroundColor: theme.scaffoldBackgroundColor,
                                 radius: 45,
@@ -142,8 +129,23 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                                       .copyWith(color: theme.primaryColor),
                                 ),
                               );
-                            },
-                          );
+                            }
+                            return CircleAvatar(
+                              backgroundColor: theme.scaffoldBackgroundColor,
+                              radius: 45,
+                              foregroundImage: MemoryImage(state.avatar),
+                            );
+                          } else {
+                            return CircleAvatar(
+                              backgroundColor:
+                                  theme.errorColor.withOpacity(0.5),
+                              radius: 45,
+                              child: Icon(
+                                Icons.warning_amber_outlined,
+                                color: theme.errorColor,
+                              ),
+                            );
+                          }
                         },
                       ),
                     ),
@@ -175,11 +177,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                             ),
                           ),
                           onPressed: () async {
-                            String path = await ImageService.pickImage();
-                            if (path.isNotEmpty) {
-                              modClient.avatarPath = path;
-                              avatarNotifier.value = !avatarNotifier.value;
-                            }
+                            avatarBloc.add(AvatarSelectEvent());
                           },
                         ),
                       ),
@@ -207,8 +205,31 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                             ),
                           ),
                           onPressed: () {
-                            modClient.avatarPath = '';
-                            avatarNotifier.value = !avatarNotifier.value;
+                            if (modClient.avatarPath.isEmpty) {
+                              ScaffoldMessenger.of(context)
+                                ..removeCurrentSnackBar()
+                                ..showSnackBar(
+                                  showInfoSnackBar(
+                                    context: context,
+                                    info: 'Нет фото',
+                                  ),
+                                );
+                            } else {
+                              showAskBottomSheet(
+                                context: context,
+                                title:
+                                    'Вы действительно хотите удалить аватарку?',
+                                text1: 'Отмена',
+                                text2: 'Удалить',
+                                onPressed1: () {
+                                  Navigator.of(context).pop();
+                                },
+                                onPressed2: () {
+                                  avatarBloc.add(AvatarDeleteEvent());
+                                  Navigator.of(context).pop();
+                                },
+                              );
+                            }
                           },
                         ),
                       ),
@@ -370,10 +391,9 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                                         Navigator.of(context).pushNamed(
                                           constant_routes.gallery,
                                           arguments: {
-                                            'images' : modClient.images,
+                                            'images': modClient.images,
                                             'index': index,
-                                            'onDelete': () {
-                                            },
+                                            'onDelete': () {},
                                             'onAdd': () {},
                                           },
                                         );
