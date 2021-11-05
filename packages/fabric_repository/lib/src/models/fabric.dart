@@ -4,16 +4,16 @@ class Fabric {
   Fabric({
     this.id,
     String? title,
-    double? retailPrice,
-    double? purchasePrice,
+    int? retailPrice,
+    int? purchasePrice,
   })  : title = title ?? '',
-        retailPrice = retailPrice ?? 0.0,
-        purchasePrice = purchasePrice ?? 0.0;
+        retailPrice = retailPrice ?? 0,
+        purchasePrice = purchasePrice ?? 0;
 
   int? id;
   String title;
-  double retailPrice;
-  double purchasePrice;
+  int retailPrice;
+  int purchasePrice;
 
   @override
   int get hashCode {

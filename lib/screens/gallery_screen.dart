@@ -62,7 +62,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     },
                     itemCount: state.gallery.length,
                     itemBuilder: (context, index) {
-                      return Image.memory(state.gallery[index]);
+                      return InteractiveViewer(
+                        child: Image.memory(state.gallery[index]),
+                      );
                     },
                   );
                 } else {

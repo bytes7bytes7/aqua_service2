@@ -10,14 +10,14 @@ class FabricEntity extends Equatable {
 
   final int? id;
   final String title;
-  final double? retailPrice;
-  final double? purchasePrice;
+  final int? retailPrice;
+  final int? purchasePrice;
 
   FabricEntity.fromMap(Map<String, Object?> map)
       : id = map['id'] as int,
         title = map['title'] as String,
-        retailPrice = map['retailPrice'] as double?,
-        purchasePrice = map['purchasePrice'] as double?;
+        retailPrice = map['retailPrice'] as int?,
+        purchasePrice = map['purchasePrice'] as int?;
 
   @override
   List<Object?> get props => [id, title, retailPrice, purchasePrice];

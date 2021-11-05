@@ -8,6 +8,6 @@ const String purchasePrice = 'purchasePrice';
 Map<String, Map<Type, bool>> fields = {
   id: {int: false},
   title: {String: false},
-  retailPrice: {double: true},
-  purchasePrice: {double: true},
+  retailPrice: {int: true},
+  purchasePrice: {int: true},
 };

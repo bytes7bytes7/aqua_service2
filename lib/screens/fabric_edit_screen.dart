@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
-import '../services/number_format_service.dart' as number_format_service;
 import '../blocs/blocs.dart';
 import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
@@ -29,8 +28,8 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
   @override
   void initState() {
     isCreated = ValueNotifier(widget.fabric.id != null);
-    profitNotifier = ValueNotifier(number_format_service.getRidOfZero(
-        (widget.fabric.retailPrice - widget.fabric.purchasePrice).toString()));
+    profitNotifier = ValueNotifier(
+        (widget.fabric.retailPrice - widget.fabric.purchasePrice).toString());
     modFabric = Fabric.from(widget.fabric);
     savedFabric = Fabric.from(widget.fabric);
     super.initState();
@@ -48,28 +47,11 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
     final fabricBloc = context.read<FabricBloc>();
 
     void calcProfit() {
-      if (modFabric.retailPrice == 0) {
-        try {
-          double value = modFabric.purchasePrice;
-          if (value != 0) {
-            profitNotifier.value = (-(value.abs())).toString();
-          } else {
-            profitNotifier.value = value.toString();
-          }
-        } catch (e) {
-          profitNotifier.value = '?';
-        }
-      } else {
-        try {
-          profitNotifier.value =
-              (modFabric.retailPrice - modFabric.purchasePrice).toString();
-        } catch (e) {
-          profitNotifier.value = '?';
-        }
-      }
-      if (profitNotifier.value != '?') {
+      try {
         profitNotifier.value =
-            number_format_service.getRidOfZero(profitNotifier.value);
+            (modFabric.retailPrice - modFabric.purchasePrice).toString();
+      } catch (e) {
+        profitNotifier.value = '?';
       }
     }
 
@@ -143,50 +125,48 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                 ),
                 PaddingTextFormField(
                   title: 'Розничная цена',
-                  value: number_format_service
-                      .getRidOfZero(modFabric.retailPrice.toString()),
+                  value: (modFabric.retailPrice != 0)
+                      ? modFabric.retailPrice.toString()
+                      : '',
                   keyboardType: TextInputType.number,
                   onChanged: (String value) {
                     try {
-                      modFabric.retailPrice =
-                          double.parse(value.replaceAll(',', '.'));
+                      modFabric.retailPrice = int.parse(value);
                     } catch (e) {
-                      modFabric.retailPrice = 0.0;
+                      modFabric.retailPrice = 0;
                     }
                     calcProfit();
                   },
                   validator: (String? value) {
-                    value = value?.replaceAll(',', '.');
-                    if (value != null) {
+                    if (value != null && value.isNotEmpty) {
                       try {
-                        double.parse(value);
+                        int.parse(value);
                       } catch (e) {
-                        return 'Не число';
+                        return 'Ошибка';
                       }
                     }
                   },
                 ),
                 PaddingTextFormField(
                   title: 'Закупочная цена',
-                  value: number_format_service
-                      .getRidOfZero(modFabric.purchasePrice.toString()),
+                  value: (modFabric.purchasePrice != 0)
+                      ? modFabric.purchasePrice.toString()
+                      : '',
                   keyboardType: TextInputType.number,
                   onChanged: (String value) {
                     try {
-                      modFabric.purchasePrice =
-                          double.parse(value.replaceAll(',', '.'));
+                      modFabric.purchasePrice = int.parse(value);
                     } catch (e) {
-                      modFabric.purchasePrice = 0.0;
+                      modFabric.purchasePrice = 0;
                     }
                     calcProfit();
                   },
                   validator: (String? value) {
-                    value = value?.replaceAll(',', '.');
-                    if (value != null) {
+                    if (value != null && value.isNotEmpty) {
                       try {
-                        double.parse(value);
+                        int.parse(value);
                       } catch (e) {
-                        return 'Не число';
+                        return 'Ошибка';
                       }
                     }
                   },
@@ -200,7 +180,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                 ValueListenableBuilder(
                   valueListenable: isCreated,
                   builder: (context, bool value, _) {
-                    if(!value){
+                    if (!value) {
                       return const SizedBox.shrink();
                     }
                     return Padding(
@@ -211,8 +191,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                         onPressed: () {
                           showAskBottomSheet(
                             context: context,
-                            title:
-                            'Вы действительно хотите удалить материал?',
+                            title: 'Вы действительно хотите удалить материал?',
                             text1: 'Отмена',
                             text2: 'Удалить',
                             onPressed1: () {

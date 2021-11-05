@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
-import '../services/number_format_service.dart' as number_format_service;
 import '../constants/routes.dart' as constant_routes;
 
 class FabricCard extends StatelessWidget {
@@ -22,13 +21,11 @@ class FabricCard extends StatelessWidget {
         style: theme.textTheme.headline2,
       ),
       subtitle: Text(
-        number_format_service.getRidOfZero(fabric.retailPrice.toString()) +
-            ' · ' +
-            number_format_service.getRidOfZero(fabric.purchasePrice.toString()),
+        '${fabric.retailPrice} · ${fabric.purchasePrice}',
         style: theme.textTheme.subtitle1,
       ),
       trailing: Text(
-        number_format_service.getRidOfZero((fabric.retailPrice - fabric.purchasePrice).toString()),
+        '${fabric.retailPrice - fabric.purchasePrice}',
         style: theme.textTheme.headline2!.copyWith(
           color: theme.primaryColor,
         ),
