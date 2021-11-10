@@ -59,6 +59,8 @@ class RouteGenerator {
 
   static Route<dynamic> _up(Widget page) {
     return PageRouteBuilder(
+      // false for avatar preview
+      // opaque: false,
       pageBuilder: (context, animation, secondaryAnimation) {
         return page;
       },

@@ -18,6 +18,7 @@ class ClientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // TODO: it would be nice to add a hero animation for avatar preview
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,

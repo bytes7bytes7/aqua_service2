@@ -124,10 +124,15 @@ class __ClientListState extends State<_ClientList> {
               color: theme.errorColor,
               icon: Icons.delete,
               onTap: () {
-                clientBloc.add(ClientDeleteEvent(item));
-                setState(() {
-                  widget.items.removeAt(index);
-                });
+                showAskBottomSheet(
+                  context: context,
+                  title: 'Вы действительно хотите удалить клиента?',
+                  text1: 'Отмена',
+                  text2: 'Удалить',
+                  onPressed2: () {
+                    clientBloc.add(ClientDeleteEvent(item));
+                  },
+                );
               },
             ),
           ],

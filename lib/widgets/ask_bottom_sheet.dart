@@ -7,8 +7,8 @@ void showAskBottomSheet({
   required String title,
   required String text1,
   required String text2,
-  required VoidCallback onPressed1,
-  required VoidCallback onPressed2,
+  VoidCallback? onPressed1,
+  VoidCallback? onPressed2,
 }) {
   final theme = Theme.of(context);
   showModalBottomSheet(
@@ -44,7 +44,13 @@ void showAskBottomSheet({
                   Flexible(
                     child: WideButton(
                       title: text1,
-                      onPressed: onPressed1,
+                      onPressed: () {
+                        if (onPressed1 != null) {
+                          onPressed1();
+                        }
+                        // auto close
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
                   const SizedBox(width: 15),
@@ -52,7 +58,13 @@ void showAskBottomSheet({
                     child: WideButton(
                       title: text2,
                       isPositive: false,
-                      onPressed: onPressed2,
+                      onPressed: () {
+                        if (onPressed2 != null) {
+                          onPressed2();
+                        }
+                        // auto close
+                        Navigator.of(context).pop();
+                      },
                     ),
                   ),
                 ],

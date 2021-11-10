@@ -96,11 +96,7 @@ class __BodyState extends State<_Body> {
                 title: 'Выйти?\nИзменения будут утеряны!',
                 text1: 'Отмена',
                 text2: 'Выйти',
-                onPressed1: () {
-                  Navigator.of(context).pop();
-                },
                 onPressed2: () {
-                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
               );
@@ -252,12 +248,8 @@ class __BodyState extends State<_Body> {
                                     'Вы действительно хотите удалить аватарку?',
                                 text1: 'Отмена',
                                 text2: 'Удалить',
-                                onPressed1: () {
-                                  Navigator.of(context).pop();
-                                },
                                 onPressed2: () {
                                   avatarBloc.add(AvatarDeleteEvent());
-                                  Navigator.of(context).pop();
                                 },
                               );
                             }
@@ -478,12 +470,10 @@ class __BodyState extends State<_Body> {
                   ValueListenableBuilder(
                     valueListenable: isCreated,
                     builder: (context, bool value, _) {
-                      if (!value) {
-                        return const SizedBox.shrink();
-                      }
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                         child: WideButton(
+                          isActive: value,
                           isPositive: false,
                           title: 'Удалить',
                           onPressed: () {
@@ -492,15 +482,11 @@ class __BodyState extends State<_Body> {
                               title: 'Вы действительно хотите удалить клиента?',
                               text1: 'Отмена',
                               text2: 'Удалить',
-                              onPressed1: () {
-                                Navigator.pop(context);
-                              },
                               onPressed2: () {
                                 if (savedClient.id != null) {
                                   clientBloc
                                       .add(ClientDeleteEvent(savedClient));
                                 }
-                                Navigator.pop(context);
                                 Navigator.pop(context);
                               },
                             );

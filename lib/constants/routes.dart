@@ -9,3 +9,5 @@ const String reports = '/reports';
 const String calendar = '/calendar';
 const String settings = '/settings';
 const String about = '/about';
+
+const String avatarPreview = '/avatar_preview';

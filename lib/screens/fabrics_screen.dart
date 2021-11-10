@@ -124,10 +124,15 @@ class __FabricListState extends State<_FabricList> {
               color: theme.errorColor,
               icon: Icons.delete,
               onTap: () {
-                fabricBloc.add(FabricDeleteEvent(item));
-                setState(() {
-                  widget.items.removeAt(index);
-                });
+                showAskBottomSheet(
+                  context: context,
+                  title: 'Вы действительно хотите удалить материал?',
+                  text1: 'Отмена',
+                  text2: 'Удалить',
+                  onPressed2: () {
+                    fabricBloc.add(FabricDeleteEvent(item));
+                  },
+                );
               },
             ),
           ],
