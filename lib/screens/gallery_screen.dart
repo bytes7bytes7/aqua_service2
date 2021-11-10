@@ -7,10 +7,12 @@ import '../widgets/widgets.dart';
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({
     Key? key,
+    required this.galleryBloc,
     required this.images,
     required this.index,
   }) : super(key: key);
 
+  final GalleryBloc galleryBloc;
   final List<String> images;
   final int index;
 
@@ -39,7 +41,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final galleryBloc = context.read<GalleryBloc>();
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: const BackAppBar(
@@ -50,20 +51,32 @@ class _GalleryScreenState extends State<GalleryScreen> {
           Expanded(
             // TODO: find a way how to use one instance of GalleryBloc
             child: BlocBuilder<GalleryBloc, GalleryState>(
+              bloc: widget.galleryBloc,
               builder: (BuildContext context, GalleryState state) {
                 if (state is GalleryLoadingState) {
                   return const SizedBox.shrink();
                 } else if (state is GalleryDataState) {
+                  if (state.gallery.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'Пусто',
+                        style: theme.textTheme.bodyText1,
+                      ),
+                    );
+                  }
                   return PageView.builder(
                     controller: controller,
                     physics: const BouncingScrollPhysics(),
-                    onPageChanged: (int index) {
-                      indexNotifier.value = index;
-                    },
                     itemCount: state.gallery.length,
+                    onPageChanged: (i) {
+                      indexNotifier.value = i;
+                    },
                     itemBuilder: (context, index) {
                       return InteractiveViewer(
-                        child: Image.memory(state.gallery[index]),
+                        child: Image.memory(
+                          state.gallery[index],
+                          fit: BoxFit.contain,
+                        ),
                       );
                     },
                   );
@@ -97,6 +110,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 height: 50,
                 color: theme.primaryColor.withOpacity(0.3),
                 child: BlocBuilder<GalleryBloc, GalleryState>(
+                  bloc: widget.galleryBloc,
                   builder: (BuildContext context, GalleryState state) {
                     if (state is GalleryLoadingState) {
                       return const SizedBox.shrink();
@@ -166,8 +180,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    // I don't need to clear widget.images because I do it on ClientEditScreen
-                    galleryBloc.add(
+                    widget.galleryBloc.add(
                       GalleryAddEvent(widget.images),
                     );
                   },
@@ -179,7 +192,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    // TODO: add delete function
+                    widget.galleryBloc.add(
+                      GalleryDeleteEvent(
+                        widget.images..removeAt(indexNotifier.value),
+                      ),
+                    );
+                    if (indexNotifier.value != 0) {
+                      indexNotifier.value--;
+                    }
                   },
                   child: Text(
                     'Удалить',

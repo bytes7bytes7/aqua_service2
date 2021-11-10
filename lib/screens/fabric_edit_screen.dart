@@ -87,6 +87,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
+              modFabric.id ??= savedFabric.id;
               savedFabric = Fabric.from(modFabric);
               if (savedFabric.id != null) {
                 fabricBloc.add(FabricUpdateEvent(savedFabric));

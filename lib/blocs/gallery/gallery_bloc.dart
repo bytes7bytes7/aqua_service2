@@ -21,14 +21,11 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
       emit(GalleryLoadingState());
     }
     try {
-      // Need a copy of path
-      List<String> path = List.from(event.path);
-
       List<Uint8List> bytes = [];
-      for (String p in path) {
+      for (String p in event.path) {
         bytes.add(await ImageService.loadImage(p));
       }
-      return emit(GalleryDataState(bytes, path));
+      return emit(GalleryDataState(bytes, event.path));
     } catch (e) {
       return emit(GalleryErrorState(e.toString()));
     }
@@ -37,15 +34,11 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
   void _addGallery(GalleryAddEvent event, Emitter<GalleryState> emit) async {
     String p = await ImageService.pickImage();
     if (p.isNotEmpty) {
-      // Need a copy of path
-      List<String> path = List.from(event.path)..add(p);
-      add(GalleryLoadEvent(path));
+      add(GalleryLoadEvent(event.path..add(p)));
     }
   }
 
   void _deleteGallery(GalleryDeleteEvent event, Emitter<GalleryState> emit) {
-    // Need a copy of path
-    List<String> path = List.from(event.path);
-    add(GalleryLoadEvent(path));
+    add(GalleryLoadEvent(event.path));
   }
 }

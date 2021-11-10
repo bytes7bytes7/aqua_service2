@@ -7,7 +7,7 @@ import '../widgets/ask_bottom_sheet.dart';
 import '../widgets/widgets.dart';
 import '../constants/routes.dart' as constant_routes;
 
-class ClientEditScreen extends StatefulWidget {
+class ClientEditScreen extends StatelessWidget {
   const ClientEditScreen({
     Key? key,
     required this.client,
@@ -16,20 +16,57 @@ class ClientEditScreen extends StatefulWidget {
   final Client client;
 
   @override
-  State<ClientEditScreen> createState() => _ClientEditScreenState();
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AvatarBloc>(
+          create: (context) {
+            return AvatarBloc();
+          },
+        ),
+        BlocProvider<GalleryBloc>(
+          create: (context) {
+            return GalleryBloc();
+          },
+        ),
+      ],
+      child: _Body(client),
+    );
+  }
 }
 
-class _ClientEditScreenState extends State<ClientEditScreen> {
+class _Body extends StatefulWidget {
+  const _Body(
+    this.client, {
+    Key? key,
+  }) : super(key: key);
+
+  final Client client;
+
+  @override
+  State<_Body> createState() => __BodyState();
+}
+
+class __BodyState extends State<_Body> {
   late final ValueNotifier<bool> isCreated;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final Client modClient;
   late Client savedClient;
+
+  late final ClientBloc clientBloc;
+  late final AvatarBloc avatarBloc;
+  late final GalleryBloc galleryBloc;
 
   @override
   void initState() {
     isCreated = ValueNotifier(widget.client.id != null);
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
+    clientBloc = context.read<ClientBloc>();
+    avatarBloc = context.read<AvatarBloc>();
+    galleryBloc = context.read<GalleryBloc>();
+    avatarBloc.add(AvatarLoadEvent(modClient.avatarPath));
+    galleryBloc.add(GalleryLoadEvent(modClient.images));
     super.initState();
   }
 
@@ -43,9 +80,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
-    final clientBloc = context.read<ClientBloc>();
-    final avatarBloc = context.read<AvatarBloc>();
-    final galleryBloc = context.read<GalleryBloc>();
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -78,8 +112,9 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
+              modClient.id ??= savedClient.id;
               savedClient = Client.from(modClient);
-              if (modClient.id != null) {
+              if (savedClient.id != null) {
                 clientBloc.add(ClientUpdateEvent(savedClient));
               } else {
                 isCreated.value = true;
@@ -133,7 +168,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                               foregroundImage: MemoryImage(state.avatar),
                             );
                           } else {
-                            // TODO: try AvatarErrorState
                             return CircleAvatar(
                               backgroundColor: theme.scaffoldBackgroundColor,
                               radius: 45,
@@ -329,8 +363,6 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                         if (state is GalleryLoadingState) {
                           return const SizedBox.shrink();
                         } else if (state is GalleryDataState) {
-                          modClient.images.clear();
-                          modClient.images.addAll(state.path);
                           return SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             physics: const BouncingScrollPhysics(),
@@ -384,6 +416,7 @@ class _ClientEditScreenState extends State<ClientEditScreen> {
                                       Navigator.of(context).pushNamed(
                                         constant_routes.gallery,
                                         arguments: {
+                                          'galleryBloc': galleryBloc,
                                           'images': modClient.images,
                                           'index': index,
                                         },

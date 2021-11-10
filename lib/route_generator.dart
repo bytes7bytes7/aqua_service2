@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:client_repository/client_repository.dart';
-import 'package:fabric_repository/fabric_repository.dart';
 
-import 'blocs/blocs.dart';
 import 'screens/screens.dart';
 import 'constants/routes.dart' as constant_routes;
 
@@ -16,44 +12,22 @@ class RouteGenerator {
       case constant_routes.clients:
         return _left(const ClientsScreen());
       case constant_routes.clientEdit:
-        Client client = args['client'];
         return _up(
-          MultiBlocProvider(
-            providers: [
-              BlocProvider<AvatarBloc>(
-                create: (context) {
-                  return AvatarBloc()..add(AvatarLoadEvent(client.avatarPath));
-                },
-              ),
-              BlocProvider<GalleryBloc>(
-                create: (context) {
-                  return GalleryBloc()..add(GalleryLoadEvent(client.images));
-                },
-              ),
-            ],
-            child: ClientEditScreen(client: client),
-          ),
+          ClientEditScreen(client: args['client']),
         );
       case constant_routes.gallery:
-        List<String> images = args['images'];
-        int index = args['index'];
         return _up(
-          BlocProvider<GalleryBloc>(
-            create: (context) {
-              return GalleryBloc()..add(GalleryLoadEvent(images));
-            },
-            child: GalleryScreen(
-              images: images,
-              index: index,
-            ),
+          GalleryScreen(
+            galleryBloc: args['galleryBloc'],
+            images: args['images'],
+            index: args['index'],
           ),
         );
       case constant_routes.fabrics:
         return _left(const FabricsScreen());
       case constant_routes.fabricEdit:
-        Fabric? fabric = args['fabric'];
         return _up(
-          FabricEditScreen(fabric: fabric ?? Fabric()),
+          FabricEditScreen(fabric: args['fabric']),
         );
       case constant_routes.about:
         return _left(const AboutScreen());
