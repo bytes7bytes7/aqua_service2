@@ -1,6 +1,6 @@
 import 'dart:typed_data';
+import 'package:image_repository/image_repository.dart';
 
-import 'package:aqua_service2/services/image_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
@@ -9,11 +9,15 @@ part 'gallery_event.dart';
 part 'gallery_state.dart';
 
 class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
-  GalleryBloc() : super(GalleryLoadingState()) {
+  GalleryBloc(ImageRepository imageRepository)
+      : _imageRepository = imageRepository,
+        super(GalleryLoadingState()) {
     on<GalleryLoadEvent>(_loadGallery);
     on<GalleryAddEvent>(_addGallery);
     on<GalleryDeleteEvent>(_deleteGallery);
   }
+
+  final ImageRepository _imageRepository;
 
   Future<void> _loadGallery(
       GalleryLoadEvent event, Emitter<GalleryState> emit) async {
@@ -23,7 +27,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
     try {
       List<Uint8List> bytes = [];
       for (String p in event.path) {
-        bytes.add(await ImageService.loadImage(p));
+        bytes.add(await _imageRepository.loadImage(p));
       }
       return emit(GalleryDataState(bytes, event.path));
     } catch (e) {
@@ -32,7 +36,7 @@ class GalleryBloc extends Bloc<GalleryEvent, GalleryState> {
   }
 
   void _addGallery(GalleryAddEvent event, Emitter<GalleryState> emit) async {
-    String p = await ImageService.pickImage();
+    String p = await _imageRepository.pickImage();
     if (p.isNotEmpty) {
       add(GalleryLoadEvent(event.path..add(p)));
     }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:client_repository/client_repository.dart';
+import 'package:image_repository/image_repository.dart';
 
-import '../services/image_service.dart';
+import '../blocs/blocs.dart';
 import '../constants/tooltips.dart' as constant_tooltips;
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/routes.dart' as constant_routes;
@@ -24,27 +26,32 @@ class ClientCard extends StatelessWidget {
         backgroundColor: theme.primaryColor,
         child: Padding(
           padding: const EdgeInsets.all(1.0),
-          child: FutureBuilder(
-            future: ImageService.loadImage(client.avatarPath),
-            builder: (context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+          child: BlocProvider<AvatarBloc>(
+            create: (context) {
+              return AvatarBloc(const ImageRepository())
+                ..add(AvatarLoadEvent(client.avatarPath));
+            },
+            child: BlocBuilder<AvatarBloc, AvatarState>(
+              builder: (BuildContext context, AvatarState state) {
+                if (state is AvatarDataState && state.avatar.isNotEmpty) {
+                  return CircleAvatar(
+                    backgroundColor: theme.scaffoldBackgroundColor,
+                    radius: 45,
+                    foregroundImage: MemoryImage(state.avatar),
+                  );
+                }
                 return CircleAvatar(
                   backgroundColor: theme.scaffoldBackgroundColor,
-                  radius: 45,
-                  foregroundImage: MemoryImage(snapshot.data),
-                );
-              }
-              return CircleAvatar(
-                backgroundColor: theme.scaffoldBackgroundColor,
-                child: Text(
-                  client.name.isNotEmpty ? client.name[0] : '?',
-                  style: theme.textTheme.headline2!.copyWith(
-                    fontWeight: FontWeight.normal,
-                    color: theme.primaryColor,
+                  child: Text(
+                    client.name.isNotEmpty ? client.name[0] : '?',
+                    style: theme.textTheme.headline2!.copyWith(
+                      fontWeight: FontWeight.normal,
+                      color: theme.primaryColor,
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
+import 'package:image_repository/image_repository.dart';
 
 import '../blocs/blocs.dart';
 import '../widgets/ask_bottom_sheet.dart';
@@ -21,12 +22,12 @@ class ClientEditScreen extends StatelessWidget {
       providers: [
         BlocProvider<AvatarBloc>(
           create: (context) {
-            return AvatarBloc();
+            return AvatarBloc(const ImageRepository());
           },
         ),
         BlocProvider<GalleryBloc>(
           create: (context) {
-            return GalleryBloc();
+            return GalleryBloc(const ImageRepository());
           },
         ),
       ],
