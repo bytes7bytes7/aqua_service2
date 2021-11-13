@@ -35,7 +35,7 @@ class SQLiteDatabase implements DatabaseHelper {
     String sql = 'CREATE TABLE IF NOT EXISTS $table (';
     for (var entity in fields.entries) {
       String key = entity.key;
-      String nullable = entity.value.values.first ? 'NULL' : '';
+      String nullable = entity.value.values.first ? '' : 'NOT NULL';
       String type = '';
       switch (entity.value.keys.first) {
         case int:

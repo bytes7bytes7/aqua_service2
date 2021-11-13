@@ -85,17 +85,17 @@ class Client {
   @override
   String toString() {
     return 'Client {'
-        'id : $id, '
-        'avatarPath : $avatarPath, '
-        'name : $name, '
-        'city : $city, '
-        'address : $address, '
-        'phone : $phone, '
-        'volume : $volume, '
-        'previousDate : $previousDate, '
-        'nextDate : $nextDate, '
-        'images : $images, '
-        'comment : $comment'
+        'id: $id, '
+        'avatarPath: $avatarPath, '
+        'name: $name, '
+        'city: $city, '
+        'address: $address, '
+        'phone: $phone, '
+        'volume: $volume, '
+        'previousDate: $previousDate, '
+        'nextDate: $nextDate, '
+        'images: $images, '
+        'comment: $comment'
         '}';
   }
 

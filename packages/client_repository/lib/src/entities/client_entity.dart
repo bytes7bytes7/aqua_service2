@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class ClientEntity extends Equatable {
   const ClientEntity({
-    required this.id,
+    this.id,
     this.avatarPath,
     required this.name,
     required this.city,
@@ -27,6 +27,21 @@ class ClientEntity extends Equatable {
   final String? images;
   final String? comment;
 
+  @override
+  List<Object?> get props => [
+    id,
+    avatarPath,
+    name,
+    city,
+    address,
+    phone,
+    volume,
+    previousDate,
+    nextDate,
+    images,
+    comment,
+  ];
+
   ClientEntity.fromMap(Map<String, Object?> map)
       : id = map['id'] as int,
         avatarPath = map['avatarPath'] as String?,
@@ -39,21 +54,6 @@ class ClientEntity extends Equatable {
         nextDate = map['nextDate'] as String?,
         images = map['images'] as String?,
         comment = map['comment'] as String?;
-
-  @override
-  List<Object?> get props => [
-        id,
-        avatarPath,
-        name,
-        city,
-        address,
-        phone,
-        volume,
-        previousDate,
-        nextDate,
-        images,
-        comment,
-      ];
 
   @override
   String toString() {
