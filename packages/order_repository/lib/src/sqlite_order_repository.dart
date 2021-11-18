@@ -1,12 +1,14 @@
+import 'package:client_repository/client_repository.dart';
 import 'package:database_helper/database_helper.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 import 'entities/entities.dart';
 import 'models/models.dart';
-import 'fabric_repository.dart';
+import 'order_repository.dart';
 import 'constants.dart' as constants;
 
-class SQLiteFabricRepository implements FabricRepository {
-  SQLiteFabricRepository();
+class SQLiteOrderRepository implements OrderRepository {
+  SQLiteOrderRepository();
 
   static late int _maxID;
 
@@ -29,12 +31,12 @@ class SQLiteFabricRepository implements FabricRepository {
   }
 
   @override
-  Stream<List<Fabric>> fabrics() {
+  Stream<List<Order>> orders() {
     return Stream.fromFuture(
       SQLiteDatabase.instance.getNotes(constants.table).then(
         (lst) {
           return lst
-              .map<Fabric>((e) => Fabric.fromEntity(FabricEntity.fromMap(e)))
+              .map<Order>((e) => Order.fromEntity(OrderEntity.fromMap(e)))
               .toList();
         },
       ),
@@ -42,30 +44,32 @@ class SQLiteFabricRepository implements FabricRepository {
   }
 
   @override
-  Future<Fabric> getFabric(int id) async {
+  Future<Order> getOrder(int id) async {
     var map = await SQLiteDatabase.instance
         .getNote(constants.table, {constants.id: id});
-    return Fabric.fromEntity(FabricEntity.fromMap(map));
+    return Order.fromEntity(OrderEntity.fromMap(map));
   }
 
   @override
-  Future<void> addFabric(Fabric fabric) async {
-    fabric.id = maxID;
+  Future<void> addOrder(Order order) async {
+    final map = order.toEntity().toMap();
+    map[constants.id] = maxID;
     await SQLiteDatabase.instance.addNote(
       constants.table,
-      fabric.toEntity().toMap(),
+      order.toEntity().toMap(),
     );
     _maxID++;
     SQLiteDatabase.instance.updateMaxID(constants.table, maxID);
   }
 
   @override
-  Future<void> addFabrics(List<Fabric> fabrics) async {
+  Future<void> addOrders(List<Order> orders) async {
     List<Map<String, Object?>> lst = [];
     int mx = maxID;
-    for (Fabric f in fabrics) {
-      f.id = mx;
-      lst.add(f.toEntity().toMap());
+    for (Order o in orders) {
+      final map = o.toEntity().toMap();
+      map[constants.id] = mx;
+      lst.add(map);
       mx++;
     }
     _maxID = mx;
@@ -74,41 +78,41 @@ class SQLiteFabricRepository implements FabricRepository {
   }
 
   @override
-  Future<void> updateFabric(Fabric fabric) async {
+  Future<void> updateOrder(Order order) async {
     SQLiteDatabase.instance.updateNote(
       constants.table,
-      fabric.toEntity().toMap(),
-      {constants.id: fabric.id!},
+      order.toEntity().toMap(),
+      {constants.id: order.id!},
     );
   }
 
   @override
-  Future<void> deleteFabric(Fabric fabric) async {
+  Future<void> deleteOrder(Order order) async {
     SQLiteDatabase.instance.deleteNote(
       constants.table,
-      {constants.id: fabric.id!},
+      {constants.id: order.id!},
     );
   }
 
   @override
-  Future<void> deleteFabrics() async {
+  Future<void> deleteOrders() async {
     SQLiteDatabase.instance.deleteNotes(constants.table);
   }
 
   @override
-  Future<void> archiveFabric(Fabric fabric) async {
-    await SQLiteDatabase.instance.addNote(
-      constants.archiveTable,
-      fabric.toEntity().toMap(),
-    );
+  Future<void> archiveOrder(Order order) async {
+    order.done = true;
+    await updateOrder(order);
+
+    final clientRepo = SQLiteClientRepository();
+    final fabricRepo = SQLiteFabricRepository();
+
+    await clientRepo.archiveClient(order.client);
+    await fabricRepo.archiveFabrics(order.fabrics);
   }
 
   @override
-  Future<void> archiveFabrics(List<Fabric> fabrics) async {
-    List<Map<String, Object?>> lst = [];
-    for (Fabric f in fabrics) {
-      lst.add(f.toEntity().toMap());
-    }
-    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
+  Future<void> archiveOrders(List<Order> orders) async {
+
   }
 }

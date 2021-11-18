@@ -34,7 +34,7 @@ class FabricEntity extends Equatable {
 
   Map<String, Object?> toMap() {
     return {
-      // do not need id
+      'id' : id,
       'title': title,
       'retailPrice': retailPrice,
       'purchasePrice': purchasePrice,

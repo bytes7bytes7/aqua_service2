@@ -11,9 +11,9 @@ import 'constants/routes.dart' as constant_routes;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
-  await const SQLiteClientRepository().initTable();
-  await const SQLiteFabricRepository().initTable();
-  // await const SQLiteOrderRepository().initTable();
+  await SQLiteClientRepository().initTable();
+  await SQLiteFabricRepository().initTable();
+  // await SQLiteOrderRepository().initTable();
   runApp(const App());
 }
 
@@ -32,17 +32,24 @@ class App extends StatelessWidget {
         BlocProvider<ClientBloc>(
           create: (context) {
             return ClientBloc(
-              const SQLiteClientRepository(),
+              SQLiteClientRepository(),
             )..add(ClientLoadEvent());
           },
         ),
         BlocProvider<FabricBloc>(
           create: (context) {
             return FabricBloc(
-              const SQLiteFabricRepository(),
+              SQLiteFabricRepository(),
             )..add(FabricLoadEvent());
           },
         ),
+        // BlocProvider<OrderBloc>(
+        //   create: (context) {
+        //     return OrderBloc(
+        //       SQLiteOrderRepository(),
+        //     )..add(OrderLoadEvent());
+        //   },
+        // ),
       ],
       child: MaterialApp(
         title: 'Aqua Service 2',

@@ -1,6 +1,8 @@
 import 'models/fabric.dart';
 
 abstract class FabricRepository {
+  int get maxID;
+
   Future<void> initTable();
 
   Future<void> dropTable();
@@ -18,4 +20,8 @@ abstract class FabricRepository {
   Future<void> deleteFabric(Fabric fabric);
 
   Future<void> deleteFabrics();
+
+  Future<void> archiveFabric(Fabric fabric);
+
+  Future<void> archiveFabrics(List<Fabric> fabrics);
 }

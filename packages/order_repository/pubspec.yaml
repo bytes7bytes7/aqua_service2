@@ -14,6 +14,8 @@ dependencies:
     path: ../client_repository
   fabric_repository:
     path: ../fabric_repository
+  database_helper:
+    path: ../database_helper
   equatable: ^2.0.3
 
 dev_dependencies:

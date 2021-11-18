@@ -74,7 +74,7 @@ class ClientEntity extends Equatable {
 
   Map<String, Object?> toMap() {
     return {
-      // don't need id
+      'id': id,
       'avatarPath': avatarPath,
       'name': name,
       'city': city,

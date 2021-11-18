@@ -1,4 +1,5 @@
 const String table = 'fabrics';
+const String archiveTable = 'archived_fabrics';
 
 const String id = 'id';
 const String title = 'title';

@@ -33,7 +33,7 @@ class OrderEntity extends Equatable {
         comment,
       ];
 
-  OrderEntity.fromMap(Map<String, Object> map)
+  OrderEntity.fromMap(Map<String, Object?> map)
       : id = map['id'] as int,
         client = map['client'] as int,
         price = map['price'] as int?,
@@ -59,6 +59,7 @@ class OrderEntity extends Equatable {
 
   Map<String, Object?> toMap() {
     return {
+      // TODO: add id for client, fabric, order here. And add new table in db for client_mx_id, fabric_mx_id, order_mx_id
       // don't need id
       'client': client,
       'price': price,

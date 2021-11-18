@@ -6,11 +6,21 @@ import 'client_repository.dart';
 import 'constants.dart' as constants;
 
 class SQLiteClientRepository implements ClientRepository {
-  const SQLiteClientRepository();
+  SQLiteClientRepository();
+
+  static late int _maxID;
+
+  @override
+  int get maxID => _maxID;
+
+  Future<void> _setMaxID() async {
+    _maxID = await SQLiteDatabase.instance.getMaxID(constants.table);
+  }
 
   @override
   Future<void> initTable() async {
     await SQLiteDatabase.instance.init(constants.table, constants.fields);
+    await _setMaxID();
   }
 
   @override
@@ -40,25 +50,32 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> addClient(Client client) async {
-    Map map = await SQLiteDatabase.instance.addNote(
+    client.id = maxID;
+    await SQLiteDatabase.instance.addNote(
       constants.table,
       client.toEntity().toMap(),
     );
-    client.id = map[constants.id];
+    _maxID++;
+    SQLiteDatabase.instance.updateMaxID(constants.table, maxID);
   }
 
   @override
-  Future<void> addClients(List<Client> clients) {
+  Future<void> addClients(List<Client> clients) async {
     List<Map<String, Object?>> lst = [];
+    int mx = maxID;
     for (Client c in clients) {
+      c.id = mx;
       lst.add(c.toEntity().toMap());
+      mx++;
     }
-    return SQLiteDatabase.instance.addNotes(constants.table, lst);
+    _maxID = mx;
+    SQLiteDatabase.instance.addNotes(constants.table, lst);
+    SQLiteDatabase.instance.updateMaxID(constants.table, maxID);
   }
 
   @override
   Future<void> updateClient(Client client) async {
-    return SQLiteDatabase.instance.updateNote(
+     SQLiteDatabase.instance.updateNote(
       constants.table,
       client.toEntity().toMap(),
       {constants.id: client.id!},
@@ -67,7 +84,7 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> deleteClient(Client client) async {
-    return SQLiteDatabase.instance.deleteNote(
+     SQLiteDatabase.instance.deleteNote(
       constants.table,
       {constants.id: client.id!},
     );
@@ -75,6 +92,23 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> deleteClients() async {
-    return SQLiteDatabase.instance.deleteNotes(constants.table);
+     SQLiteDatabase.instance.deleteNotes(constants.table);
+  }
+
+  @override
+  Future<void> archiveClient(Client client) async {
+    await SQLiteDatabase.instance.addNote(
+      constants.archiveTable,
+      client.toEntity().toMap(),
+    );
+  }
+
+  @override
+  Future<void> archiveClients(List<Client> clients) async {
+    List<Map<String, Object?>> lst = [];
+    for (Client c in clients) {
+      lst.add(c.toEntity().toMap());
+    }
+    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
   }
 }

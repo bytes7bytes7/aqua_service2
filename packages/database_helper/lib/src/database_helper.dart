@@ -3,16 +3,23 @@ import 'package:sqflite/sqflite.dart';
 abstract class DatabaseHelper {
   Future<Database> get database;
 
+  // store max id for each table
+  Future<void> initIDTable();
+
+  Future<int> getMaxID(String idName);
+
+  Future<void> updateMaxID(String idName, int id);
+
   Future<void> init(String table, Map<String, Map<Type, bool>> fields);
 
   Future<void> dropTable(String table, Map<String, Map<Type, bool>> fields);
 
-  Future<Map<String, dynamic>> getNote(
+  Future<Map<String, Object?>> getNote(
       String table, Map<String, Object> params);
 
-  Future<List<Map<String, dynamic>>> getNotes(String table);
+  Future<List<Map<String, Object?>>> getNotes(String table);
 
-  Future<Map<String, Object?>> addNote(String table, Map<String, Object?> map);
+  Future<void> addNote(String table, Map<String, Object?> map);
 
   Future<void> addNotes(String table, List<Map<String, Object?>> lst);
 

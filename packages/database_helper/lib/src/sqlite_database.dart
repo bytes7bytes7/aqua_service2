@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
+import 'constants.dart' as constants;
 
 class SQLiteDatabase implements DatabaseHelper {
   SQLiteDatabase._();
@@ -17,6 +18,7 @@ class SQLiteDatabase implements DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _createDatabase();
+    initIDTable();
     return _database!;
   }
 
@@ -27,6 +29,53 @@ class SQLiteDatabase implements DatabaseHelper {
       path,
       version: version,
     );
+  }
+
+  @override
+  Future<void> initIDTable() async {
+    await init(constants.maxIDTable, constants.fields);
+  }
+
+  @override
+  Future<int> getMaxID(String idName) async {
+    final db = await database;
+    var data = await db.query(
+      constants.maxIDTable,
+      columns: [constants.mx],
+      where: '${constants.idName} = ?',
+      whereArgs: [idName],
+    );
+    if (data.isEmpty) {
+      return 1;
+    }
+    return data.first[constants.mx] as int;
+  }
+
+  @override
+  Future<void> updateMaxID(String idName, int id) async {
+    final db = await database;
+    var data = await db.query(
+      constants.maxIDTable,
+      columns: [constants.mx],
+      where: '${constants.idName} = ?',
+      whereArgs: [idName],
+    );
+    if (data.isEmpty) {
+      // create a row
+      await db.insert(constants.maxIDTable, {
+        constants.idName: idName,
+        constants.mx: id,
+      });
+    } else {
+      await db.update(
+        constants.maxIDTable,
+        {
+          constants.mx: id,
+        },
+        where: '${constants.idName} = ?',
+        whereArgs: [idName],
+      );
+    }
   }
 
   @override
@@ -48,7 +97,7 @@ class SQLiteDatabase implements DatabaseHelper {
           type = 'REAL';
           break;
       }
-      if (entity.key == fields.entries.first.key){
+      if (entity.key == fields.entries.first.key) {
         type += ' PRIMARY KEY';
       }
       sql += '$key $type $nullable,';
@@ -66,7 +115,7 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<Map<String, dynamic>> getNote(
+  Future<Map<String, Object?>> getNote(
       String table, Map<String, Object> params) async {
     final db = await database;
     var data = await db.query(table,
@@ -75,17 +124,15 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getNotes(String table) async {
+  Future<List<Map<String, Object?>>> getNotes(String table) async {
     final db = await database;
     return await db.query(table);
   }
 
   @override
-  Future<Map<String, Object?>> addNote(String table, Map<String, Object?> map) async {
+  Future<void> addNote(String table, Map<String, Object?> map) async {
     final db = await database;
     await db.insert(table, map);
-    var lst = await db.query(table);
-    return lst.last;
   }
 
   @override

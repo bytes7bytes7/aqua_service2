@@ -1,4 +1,5 @@
 const String table = 'clients';
+const String archiveTable = 'archived_clients';
 
 const String id = 'id';
 const String avatarPath = 'avatarPath';

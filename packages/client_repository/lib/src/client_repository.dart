@@ -1,6 +1,8 @@
 import 'models/client.dart';
 
 abstract class ClientRepository {
+  int get maxID;
+
   Future<void> initTable();
 
   Future<void> dropTable();
@@ -18,4 +20,8 @@ abstract class ClientRepository {
   Future<void> deleteClient(Client client);
 
   Future<void> deleteClients();
+
+  Future<void> archiveClient(Client client);
+
+  Future<void> archiveClients(List<Client> clients);
 }
