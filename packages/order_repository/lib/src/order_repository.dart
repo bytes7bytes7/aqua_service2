@@ -7,7 +7,8 @@ abstract class OrderRepository{
 
   Future<void> dropTable();
 
-  Stream<List<Order>> orders();
+  // int -> client id
+  Stream<Map<int, List<Order>>> orders();
 
   Future<Order> getOrder(int id);
 

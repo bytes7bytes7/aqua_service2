@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
+import 'package:order_repository/order_repository.dart';
 
 import 'route_generator.dart';
 import 'themes/light_theme.dart';
@@ -13,7 +14,7 @@ void main() async {
   Bloc.observer = SimpleBlocObserver();
   await SQLiteClientRepository().initTable();
   await SQLiteFabricRepository().initTable();
-  // await SQLiteOrderRepository().initTable();
+  await SQLiteOrderRepository().initTable();
   runApp(const App());
 }
 
@@ -43,19 +44,19 @@ class App extends StatelessWidget {
             )..add(FabricLoadEvent());
           },
         ),
-        // BlocProvider<OrderBloc>(
-        //   create: (context) {
-        //     return OrderBloc(
-        //       SQLiteOrderRepository(),
-        //     )..add(OrderLoadEvent());
-        //   },
-        // ),
+        BlocProvider<OrderBloc>(
+          create: (context) {
+            return OrderBloc(
+              SQLiteOrderRepository(),
+            )..add(OrderLoadEvent());
+          },
+        ),
       ],
       child: MaterialApp(
         title: 'Aqua Service 2',
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
-        initialRoute: constant_routes.clients,
+        initialRoute: constant_routes.orders,
         onGenerateRoute: RouteGenerator.generateRoute,
       ),
     );

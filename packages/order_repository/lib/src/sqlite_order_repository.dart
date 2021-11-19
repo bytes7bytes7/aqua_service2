@@ -1,5 +1,5 @@
-import 'package:client_repository/client_repository.dart';
 import 'package:database_helper/database_helper.dart';
+import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
 import 'entities/entities.dart';
@@ -31,13 +31,21 @@ class SQLiteOrderRepository implements OrderRepository {
   }
 
   @override
-  Stream<List<Order>> orders() {
+  Stream<Map<int, List<Order>>> orders() {
     return Stream.fromFuture(
       SQLiteDatabase.instance.getNotes(constants.table).then(
-        (lst) {
-          return lst
-              .map<Order>((e) => Order.fromEntity(OrderEntity.fromMap(e)))
-              .toList();
+        (lst) async {
+          Map<int, List<Order>> map = {};
+          for (Map<String, Object?> m in lst) {
+            Order o = Order.fromEntity(OrderEntity.fromMap(m));
+            o.client = await SQLiteClientRepository().getClient(o.client.id!);
+            if (map.containsKey(o.client.id)) {
+              (map[o.client.id] as List).add(o);
+            } else {
+              map[o.client.id!] = [o];
+            }
+          }
+          return map;
         },
       ),
     );

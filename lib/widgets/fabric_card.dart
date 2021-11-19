@@ -16,6 +16,7 @@ class FabricCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ListTile(
+      hoverColor: theme.disabledColor,
       title: Text(
         fabric.title,
         style: theme.textTheme.headline2,
@@ -30,7 +31,6 @@ class FabricCard extends StatelessWidget {
           color: theme.primaryColor,
         ),
       ),
-      hoverColor: theme.disabledColor,
       onTap: () {
         Navigator.of(context).pushNamed(
           constant_routes.fabricEdit,

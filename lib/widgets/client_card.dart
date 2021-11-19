@@ -22,6 +22,7 @@ class ClientCard extends StatelessWidget {
     final theme = Theme.of(context);
     // TODO: it would be nice to add a hero animation for avatar preview
     return ListTile(
+      hoverColor: theme.disabledColor,
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,
         child: Padding(
@@ -36,12 +37,13 @@ class ClientCard extends StatelessWidget {
                 if (state is AvatarDataState && state.avatar.isNotEmpty) {
                   return CircleAvatar(
                     backgroundColor: theme.scaffoldBackgroundColor,
-                    radius: 45,
+                    radius: constant_sizes.avatarRadius,
                     foregroundImage: MemoryImage(state.avatar),
                   );
                 }
                 return CircleAvatar(
                   backgroundColor: theme.scaffoldBackgroundColor,
+                  radius: constant_sizes.avatarRadius,
                   child: Text(
                     client.name.isNotEmpty ? client.name[0] : '?',
                     style: theme.textTheme.headline2!.copyWith(
@@ -74,7 +76,6 @@ class ClientCard extends StatelessWidget {
               },
             )
           : const SizedBox.shrink(),
-      hoverColor: theme.disabledColor,
       onTap: () {
         Navigator.of(context).pushNamed(
           constant_routes.clientEdit,

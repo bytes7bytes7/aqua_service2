@@ -7,6 +7,8 @@ export 'error_card.dart';
 export 'fabric_card.dart';
 export 'info_snack_bar.dart';
 export 'loading_circle.dart';
+export 'order_card.dart';
+export 'order_list_item.dart';
 export 'padding_text_field_notifier.dart';
 export 'padding_text_form_field.dart';
 export 'wide_button.dart';

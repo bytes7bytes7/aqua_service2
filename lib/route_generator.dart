@@ -1,3 +1,4 @@
+import 'package:aqua_service2/screens/orders_screen.dart';
 import 'package:flutter/material.dart';
 
 import 'screens/screens.dart';
@@ -29,6 +30,8 @@ class RouteGenerator {
         return _up(
           FabricEditScreen(fabric: args['fabric']),
         );
+      case constant_routes.orders:
+        return _left(const OrdersScreen());
       case constant_routes.about:
         return _left(const AboutScreen());
       default:
