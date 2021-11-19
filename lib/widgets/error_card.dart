@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class ErrorCard extends StatelessWidget {
   const ErrorCard({
@@ -29,7 +30,7 @@ class ErrorCard extends StatelessWidget {
           children: [
             Text(
               'Ошибка',
-              style: theme.textTheme.bodyText1,
+              style: theme.textTheme.headline2,
             ),
             const SizedBox(height: 10),
             SizedBox(
@@ -49,7 +50,9 @@ class ErrorCard extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                // TODO: add copy function
+                Clipboard.setData(
+                  ClipboardData(text: error),
+                );
               },
             ),
             TextButton(

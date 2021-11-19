@@ -45,6 +45,9 @@ class SQLiteClientRepository implements ClientRepository {
   Future<Client> getClient(int id) async {
     var map = await SQLiteDatabase.instance
         .getNote(constants.table, {constants.id: id});
+    if (map.isEmpty) {
+      return Client(id: id);
+    }
     return Client.fromEntity(ClientEntity.fromMap(map));
   }
 

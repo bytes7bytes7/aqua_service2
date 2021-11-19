@@ -7,7 +7,6 @@ import 'package:image_repository/image_repository.dart';
 import 'package:order_repository/order_repository.dart';
 
 import '../blocs/blocs.dart';
-import '../constants/tooltips.dart' as constant_tooltips;
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/routes.dart' as constant_routes;
 import 'ask_bottom_sheet.dart';
@@ -42,6 +41,7 @@ class _OrderCardState extends State<OrderCard> {
     final orders = widget.orders;
     return ExpansionTileCard(
       key: cardKey,
+      elevation: 0,
       borderRadius: BorderRadius.circular(0),
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,
@@ -65,7 +65,7 @@ class _OrderCardState extends State<OrderCard> {
                   backgroundColor: theme.scaffoldBackgroundColor,
                   radius: constant_sizes.avatarRadius,
                   child: Text(
-                    client.name.isNotEmpty ? client.name[0] : '?',
+                    client.name.isNotEmpty ? client.name[0] : '${client.id}',
                     style: theme.textTheme.headline2!.copyWith(
                       fontWeight: FontWeight.normal,
                       color: theme.primaryColor,

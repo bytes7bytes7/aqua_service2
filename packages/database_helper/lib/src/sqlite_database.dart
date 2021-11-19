@@ -120,6 +120,9 @@ class SQLiteDatabase implements DatabaseHelper {
     final db = await database;
     var data = await db.query(table,
         where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
+    if (data.isEmpty) {
+      return {};
+    }
     return data.first;
   }
 

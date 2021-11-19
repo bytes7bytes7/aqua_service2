@@ -49,7 +49,7 @@ class OrdersScreen extends StatelessWidget {
               child: const Icon(Icons.add),
               onPressed: () {
                 orderBloc.add(OrderAddEvent(Order(
-                  client: Client(id: 1),
+                  client: Client(id: 2),
                   fabrics: [
                     Fabric(
                       id: 1,

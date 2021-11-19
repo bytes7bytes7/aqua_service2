@@ -89,7 +89,7 @@ class Order {
       fabrics: fabrics.map((e) => e.id).join(','),
       expenses: expenses,
       date: date.toString(),
-      done: done,
+      done: done ? 1 : 0,
       comment: comment,
     );
   }
@@ -105,7 +105,7 @@ class Order {
           .toList(),
       expenses: entity.expenses,
       date: DateTime.parse(entity.date),
-      done: entity.done,
+      done: entity.done == 1 ? true : false,
       comment: entity.comment,
     );
   }

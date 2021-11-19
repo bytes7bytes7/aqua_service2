@@ -18,7 +18,7 @@ class OrderEntity extends Equatable {
   final String? fabrics;
   final int? expenses;
   final String date;
-  final bool done;
+  final int done;
   final String? comment;
 
   @override
@@ -40,7 +40,7 @@ class OrderEntity extends Equatable {
         fabrics = map['fabrics'] as String?,
         expenses = map['expenses'] as int?,
         date = map['date'] as String,
-        done = (map['done'] as int) == 1 ? true : false,
+        done = map['done'] as int,
         comment = map['comment'] as String?;
 
   @override
