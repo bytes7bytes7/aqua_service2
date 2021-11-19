@@ -113,6 +113,20 @@ class SQLiteOrderRepository implements OrderRepository {
 
   @override
   Future<void> archiveOrders(List<Order> orders) async {
+    final clientRepo = SQLiteClientRepository();
+    final fabricRepo = SQLiteFabricRepository();
 
+    List<Client> clients = [];
+    List<Fabric> fabrics = [];
+
+    for (Order order in orders) {
+      order.done = true;
+      await updateOrder(order);
+      clients.add(order.client);
+      fabrics.addAll(order.fabrics);
+    }
+
+    await clientRepo.archiveClients(clients);
+    await fabricRepo.archiveFabrics(fabrics);
   }
 }
