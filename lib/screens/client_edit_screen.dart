@@ -178,91 +178,94 @@ class __BodyState extends State<_Body> {
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: size.width * 0.3,
-                        child: OutlinedButton(
-                          child: FittedBox(
-                            child: Text(
-                              'Изменить',
-                              style: theme.textTheme.bodyText1,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            primary: theme.primaryColor,
-                            side: BorderSide(
-                              color: theme.disabledColor,
-                            ),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(20),
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.zero,
-                                bottomRight: Radius.zero,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: size.width * 0.3,
+                          child: OutlinedButton(
+                            child: FittedBox(
+                              child: Text(
+                                'Изменить',
+                                style: theme.textTheme.bodyText1,
                               ),
                             ),
+                            style: OutlinedButton.styleFrom(
+                              primary: theme.primaryColor,
+                              side: BorderSide(
+                                color: theme.disabledColor,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(20),
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.zero,
+                                  bottomRight: Radius.zero,
+                                ),
+                              ),
+                            ),
+                            onPressed: () async {
+                              avatarBloc.add(AvatarSelectEvent());
+                            },
                           ),
-                          onPressed: () async {
-                            avatarBloc.add(AvatarSelectEvent());
-                          },
                         ),
-                      ),
-                      SizedBox(
-                        width: size.width * 0.3,
-                        child: OutlinedButton(
-                          child: FittedBox(
-                            child: Text(
-                              'Удалить',
-                              style: theme.textTheme.bodyText1,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            primary: theme.primaryColor,
-                            side: BorderSide(
-                              color: theme.disabledColor,
-                            ),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
-                                bottomLeft: Radius.zero,
-                                topLeft: Radius.zero,
+                        SizedBox(
+                          width: size.width * 0.3,
+                          child: OutlinedButton(
+                            child: FittedBox(
+                              child: Text(
+                                'Удалить',
+                                style: theme.textTheme.bodyText1,
                               ),
                             ),
-                          ),
-                          onPressed: () {
-                            if (modClient.avatarPath.isEmpty) {
-                              ScaffoldMessenger.of(context)
-                                ..removeCurrentSnackBar()
-                                ..showSnackBar(
-                                  showInfoSnackBar(
-                                    context: context,
-                                    info: 'Нет фото',
-                                  ),
+                            style: OutlinedButton.styleFrom(
+                              primary: theme.primaryColor,
+                              side: BorderSide(
+                                color: theme.disabledColor,
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                  bottomLeft: Radius.zero,
+                                  topLeft: Radius.zero,
+                                ),
+                              ),
+                            ),
+                            onPressed: () {
+                              if (modClient.avatarPath.isEmpty) {
+                                ScaffoldMessenger.of(context)
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(
+                                    showInfoSnackBar(
+                                      context: context,
+                                      info: 'Нет фото',
+                                    ),
+                                  );
+                              } else {
+                                showAskBottomSheet(
+                                  context: context,
+                                  title:
+                                      'Вы действительно хотите удалить аватарку?',
+                                  text1: 'Отмена',
+                                  text2: 'Удалить',
+                                  onPressed2: () {
+                                    avatarBloc.add(AvatarDeleteEvent());
+                                  },
                                 );
-                            } else {
-                              showAskBottomSheet(
-                                context: context,
-                                title:
-                                    'Вы действительно хотите удалить аватарку?',
-                                text1: 'Отмена',
-                                text2: 'Удалить',
-                                onPressed2: () {
-                                  avatarBloc.add(AvatarDeleteEvent());
-                                },
-                              );
-                            }
-                          },
+                              }
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Container(
                     alignment: Alignment.centerLeft,
                     width: double.infinity,
-                    margin: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 0.0),
+                    margin: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 30.0),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 27.0,
                       vertical: 16.0,
@@ -350,7 +353,7 @@ class __BodyState extends State<_Body> {
                   ),
                   Container(
                     height: 230,
-                    padding: const EdgeInsets.symmetric(vertical: 30.0),
+                    padding: const EdgeInsets.only(bottom: 30.0),
                     child: BlocBuilder<GalleryBloc, GalleryState>(
                       builder: (BuildContext context, GalleryState state) {
                         if (state is GalleryLoadingState) {

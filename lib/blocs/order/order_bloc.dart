@@ -1,4 +1,4 @@
-import'package:bloc/bloc.dart';
+import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:order_repository/order_repository.dart';
 
@@ -14,6 +14,7 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     on<OrderAddEvent>(_addOrder);
     on<OrderUpdateEvent>(_updateOrder);
     on<OrderDeleteEvent>(_deleteOrder);
+    on<OrderArchiveEvent>(_archiveOrder);
   }
 
   final OrderRepository _orderRepository;
@@ -48,6 +49,12 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   void _deleteOrder(OrderDeleteEvent event, Emitter<OrderState> emit) {
     _orderRepository
         .deleteOrder(event.order)
+        .then((value) => add(OrderLoadEvent()));
+  }
+
+  void _archiveOrder(OrderArchiveEvent event, Emitter<OrderState> emit) {
+    _orderRepository
+        .archiveOrder(event.order)
         .then((value) => add(OrderLoadEvent()));
   }
 }

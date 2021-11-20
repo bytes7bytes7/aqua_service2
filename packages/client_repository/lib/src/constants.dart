@@ -13,6 +13,13 @@ const String nextDate = 'nextDate';
 const String images = 'images';
 const String comment = 'comment';
 
+// time for archive table
+const String actualTime = 'actualTime';
+
+Map<String, Map<Type, bool>> timeField = {
+  actualTime: {String: false},
+};
+
 Map<String, Map<Type, bool>> fields = {
   id: {int: false},
   avatarPath: {String: true},

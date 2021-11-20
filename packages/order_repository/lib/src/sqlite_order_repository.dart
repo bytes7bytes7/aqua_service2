@@ -39,6 +39,8 @@ class SQLiteOrderRepository implements OrderRepository {
           for (Map<String, Object?> m in lst) {
             Order o = Order.fromEntity(OrderEntity.fromMap(m));
             o.client = await SQLiteClientRepository().getClient(o.client.id!);
+            List<int> fabrics = o.fabrics.map((e) => e.id!).toList();
+            o.fabrics = await SQLiteFabricRepository().getFabrics(fabrics);
             if (map.containsKey(o.client.id)) {
               (map[o.client.id] as List).add(o);
             } else {

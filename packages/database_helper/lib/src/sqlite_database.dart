@@ -9,7 +9,6 @@ import 'constants.dart' as constants;
 class SQLiteDatabase implements DatabaseHelper {
   SQLiteDatabase._();
 
-  final String databaseName = 'data.db';
   final int version = 1;
   static final SQLiteDatabase instance = SQLiteDatabase._();
   Database? _database;
@@ -24,11 +23,14 @@ class SQLiteDatabase implements DatabaseHelper {
 
   Future<Database> _createDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, databaseName);
-    return await openDatabase(
+    String path = join(documentsDirectory.path, constants.databaseName);
+    final db = await openDatabase(
       path,
       version: version,
     );
+    // IMPORTANT: this line disables journal_mode
+    db.rawQuery('PRAGMA JOURNAL_MODE = DELETE');
+    return db;
   }
 
   @override
@@ -79,7 +81,8 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<void> init(String table, Map<String, Map<Type, bool>> fields) async {
+  Future<void> init(String table, Map<String, Map<Type, bool>> fields,
+      [bool firstPrimaryKey = true]) async {
     final db = await database;
     String sql = 'CREATE TABLE IF NOT EXISTS $table (';
     for (var entity in fields.entries) {
@@ -97,7 +100,7 @@ class SQLiteDatabase implements DatabaseHelper {
           type = 'REAL';
           break;
       }
-      if (entity.key == fields.entries.first.key) {
+      if (firstPrimaryKey && entity.key == fields.entries.first.key) {
         type += ' PRIMARY KEY';
       }
       sql += '$key $type $nullable,';
@@ -127,9 +130,16 @@ class SQLiteDatabase implements DatabaseHelper {
   }
 
   @override
-  Future<List<Map<String, Object?>>> getNotes(String table) async {
+  Future<List<Map<String, Object?>>> getNotes(String table,
+      [Map<String, List<Object>> params = const {}]) async {
     final db = await database;
-    return await db.query(table);
+    if (params.isEmpty) {
+      return await db.query(table);
+    }
+    return await db.query(
+      table,
+      where: '${params.keys.first} IN (${params.values.first.join(', ')})',
+    );
   }
 
   @override

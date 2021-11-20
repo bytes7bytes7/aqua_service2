@@ -17,7 +17,8 @@ abstract class DatabaseHelper {
   Future<Map<String, Object?>> getNote(
       String table, Map<String, Object> params);
 
-  Future<List<Map<String, Object?>>> getNotes(String table);
+  Future<List<Map<String, Object?>>> getNotes(
+      String table, Map<String, List<Object>> params);
 
   Future<void> addNote(String table, Map<String, Object?> map);
 

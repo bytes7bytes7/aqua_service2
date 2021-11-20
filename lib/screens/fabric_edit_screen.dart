@@ -108,6 +108,7 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
             key: _formKey,
             child: Column(
               children: [
+                const SizedBox(height: 20.0),
                 PaddingTextFormField(
                   title: 'Название',
                   value: modFabric.title,
@@ -172,7 +173,6 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                   title: 'Прибыль',
                   notifier: profitNotifier,
                 ),
-                const SizedBox(height: 30.0),
                 // TODO: find a way how to place this button at the bottom
                 ValueListenableBuilder(
                   valueListenable: isCreated,

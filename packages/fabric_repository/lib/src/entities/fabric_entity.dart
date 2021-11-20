@@ -6,21 +6,30 @@ class FabricEntity extends Equatable {
     required this.title,
     this.retailPrice,
     this.purchasePrice,
+    this.actualTime,
   });
 
   final int? id;
   final String title;
   final int? retailPrice;
   final int? purchasePrice;
+  final String? actualTime;
 
   @override
-  List<Object?> get props => [id, title, retailPrice, purchasePrice];
+  List<Object?> get props => [
+        id,
+        title,
+        retailPrice,
+        purchasePrice,
+        actualTime,
+      ];
 
   FabricEntity.fromMap(Map<String, Object?> map)
       : id = map['id'] as int,
         title = map['title'] as String,
         retailPrice = map['retailPrice'] as int?,
-        purchasePrice = map['purchasePrice'] as int?;
+        purchasePrice = map['purchasePrice'] as int?,
+        actualTime = map['actualTime'] as String?;
 
   @override
   String toString() {
@@ -28,16 +37,18 @@ class FabricEntity extends Equatable {
         'id: $id, '
         'title: $title, '
         'retailPrice: $retailPrice, '
-        'purchasePrice: $purchasePrice'
+        'purchasePrice: $purchasePrice, '
+        'actualTime: $actualTime'
         '}';
   }
 
-  Map<String, Object?> toMap() {
+  Map<String, Object?> toMap({bool archived = false}) {
     return {
-      'id' : id,
+      'id': id,
       'title': title,
       'retailPrice': retailPrice,
       'purchasePrice': purchasePrice,
+      if (archived) 'actualTime': actualTime,
     };
   }
 }

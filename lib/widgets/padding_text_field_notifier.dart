@@ -19,7 +19,7 @@ class PaddingTextFieldNotifier extends StatelessWidget {
       valueListenable: notifier,
       builder: (context, String value, Widget? child) {
         return Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 30.0, 20.0, 0.0),
+          padding: const EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 30.0),
           child: Container(
             width: double.infinity,
             padding:
@@ -32,7 +32,7 @@ class PaddingTextFieldNotifier extends StatelessWidget {
             ),
             child: Text(
               title + ': ' + value,
-              style: theme.textTheme.bodyText1!
+              style: theme.textTheme.headline2!
                   .copyWith(color: theme.primaryColor),
             ),
           ),

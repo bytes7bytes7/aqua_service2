@@ -11,6 +11,8 @@ abstract class FabricRepository {
 
   Future<Fabric> getFabric(int id);
 
+  Future<List<Fabric>> getFabrics(List<int> id);
+
   Future<void> addFabric(Fabric fabric);
 
   Future<void> addFabrics(List<Fabric> fabrics);

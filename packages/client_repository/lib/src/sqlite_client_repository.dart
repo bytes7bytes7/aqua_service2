@@ -20,6 +20,7 @@ class SQLiteClientRepository implements ClientRepository {
   @override
   Future<void> initTable() async {
     await SQLiteDatabase.instance.init(constants.table, constants.fields);
+    await SQLiteDatabase.instance.init(constants.archiveTable, constants.fields..addAll(constants.timeField), false);
     await _setMaxID();
   }
 
@@ -100,9 +101,10 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> archiveClient(Client client) async {
+    client.actualTime = DateTime.now();
     await SQLiteDatabase.instance.addNote(
       constants.archiveTable,
-      client.toEntity().toMap(),
+      client.toEntity().toMap(archived: true),
     );
   }
 
@@ -110,7 +112,8 @@ class SQLiteClientRepository implements ClientRepository {
   Future<void> archiveClients(List<Client> clients) async {
     List<Map<String, Object?>> lst = [];
     for (Client c in clients) {
-      lst.add(c.toEntity().toMap());
+      c.actualTime = DateTime.now();
+      lst.add(c.toEntity().toMap(archived: true));
     }
     SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
   }

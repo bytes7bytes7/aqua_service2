@@ -6,6 +6,7 @@ class Fabric {
     String? title,
     int? retailPrice,
     int? purchasePrice,
+    this.actualTime,
   })  : title = title ?? '',
         retailPrice = retailPrice ?? 0,
         purchasePrice = purchasePrice ?? 0;
@@ -14,20 +15,23 @@ class Fabric {
   String title;
   int retailPrice;
   int purchasePrice;
+  DateTime? actualTime;
 
   @override
   int get hashCode {
     return id.hashCode ^
         title.hashCode ^
         retailPrice.hashCode ^
-        purchasePrice.hashCode;
+        purchasePrice.hashCode ^
+        actualTime.hashCode;
   }
 
   Fabric.from(Fabric other)
       : id = other.id,
         title = other.title,
         retailPrice = other.retailPrice,
-        purchasePrice = other.purchasePrice;
+        purchasePrice = other.purchasePrice,
+        actualTime = other.actualTime;
 
   @override
   bool operator ==(Object other) {
@@ -36,7 +40,8 @@ class Fabric {
             id == other.id &&
             title == other.title &&
             retailPrice == other.retailPrice &&
-            purchasePrice == other.purchasePrice;
+            purchasePrice == other.purchasePrice &&
+            actualTime == other.actualTime;
   }
 
   @override
@@ -45,7 +50,8 @@ class Fabric {
         'id: $id, '
         'title: $title, '
         'retailPrice: $retailPrice, '
-        'purchasePrice: $purchasePrice'
+        'purchasePrice: $purchasePrice, '
+        'actualTime: $actualTime'
         '}';
   }
 
@@ -55,6 +61,7 @@ class Fabric {
       title: title,
       retailPrice: retailPrice != 0 ? retailPrice : null,
       purchasePrice: purchasePrice != 0 ? purchasePrice : null,
+      actualTime: actualTime?.toString(),
     );
   }
 
@@ -64,6 +71,8 @@ class Fabric {
       title: entity.title,
       retailPrice: entity.retailPrice,
       purchasePrice: entity.purchasePrice,
+      actualTime:
+          entity.actualTime != null ? DateTime.parse(entity.actualTime!) : null,
     );
   }
 }

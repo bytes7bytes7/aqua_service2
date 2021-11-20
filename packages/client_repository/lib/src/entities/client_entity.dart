@@ -13,6 +13,7 @@ class ClientEntity extends Equatable {
     this.nextDate,
     this.images,
     this.comment,
+    this.actualTime,
   });
 
   final int? id;
@@ -26,21 +27,23 @@ class ClientEntity extends Equatable {
   final String? nextDate;
   final String? images;
   final String? comment;
+  final String? actualTime;
 
   @override
   List<Object?> get props => [
-    id,
-    avatarPath,
-    name,
-    city,
-    address,
-    phone,
-    volume,
-    previousDate,
-    nextDate,
-    images,
-    comment,
-  ];
+        id,
+        avatarPath,
+        name,
+        city,
+        address,
+        phone,
+        volume,
+        previousDate,
+        nextDate,
+        images,
+        comment,
+        actualTime,
+      ];
 
   ClientEntity.fromMap(Map<String, Object?> map)
       : id = map['id'] as int,
@@ -53,7 +56,8 @@ class ClientEntity extends Equatable {
         previousDate = map['previousDate'] as String?,
         nextDate = map['nextDate'] as String?,
         images = map['images'] as String?,
-        comment = map['comment'] as String?;
+        comment = map['comment'] as String?,
+        actualTime = map['actualTime'] as String?;
 
   @override
   String toString() {
@@ -69,10 +73,11 @@ class ClientEntity extends Equatable {
         'nextDate: $nextDate, '
         'images: $images, '
         'comment: $comment,'
+        'actualTime: $actualTime'
         '}';
   }
 
-  Map<String, Object?> toMap() {
+  Map<String, Object?> toMap({bool archived = false}) {
     return {
       'id': id,
       'avatarPath': avatarPath,
@@ -85,6 +90,7 @@ class ClientEntity extends Equatable {
       'nextDate': nextDate,
       'images': images,
       'comment': comment,
+      if (archived) 'actualTime': actualTime,
     };
   }
 }

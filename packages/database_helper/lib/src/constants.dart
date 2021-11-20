@@ -1,3 +1,4 @@
+const String databaseName = 'data.db';
 const String maxIDTable = 'max_id';
 
 const String idName = 'id_name';

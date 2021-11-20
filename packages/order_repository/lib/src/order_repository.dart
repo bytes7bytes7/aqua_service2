@@ -1,6 +1,6 @@
 import 'models/models.dart';
 
-abstract class OrderRepository{
+abstract class OrderRepository {
   int get maxID;
 
   Future<void> initTable();

@@ -44,3 +44,15 @@ class OrderDeleteEvent extends OrderEvent {
   @override
   String toString() => 'OrderDeleteEvent {order: $order}';
 }
+
+class OrderArchiveEvent extends OrderEvent {
+  const OrderArchiveEvent(this.order);
+
+  final Order order;
+
+  @override
+  List<Object?> get props => [order];
+
+  @override
+  String toString() => 'OrderArchiveEvent {order: $order}';
+}

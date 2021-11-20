@@ -14,6 +14,7 @@ class Client {
     String? nextDate,
     List<String>? images,
     String? comment,
+    this.actualTime,
   })  : avatarPath = avatarPath ?? '',
         name = name ?? '',
         city = city ?? '',
@@ -36,6 +37,7 @@ class Client {
   String nextDate;
   List<String> images;
   String comment;
+  DateTime? actualTime;
 
   Client.from(Client other)
       : id = other.id,
@@ -48,7 +50,8 @@ class Client {
         previousDate = other.previousDate,
         nextDate = other.nextDate,
         images = List.from(other.images),
-        comment = other.comment;
+        comment = other.comment,
+        actualTime = other.actualTime;
 
   @override
   int get hashCode {
@@ -62,7 +65,8 @@ class Client {
         previousDate.hashCode ^
         nextDate.hashCode ^
         images.hashCode ^
-        comment.hashCode;
+        comment.hashCode ^
+        actualTime.hashCode;
   }
 
   @override
@@ -79,7 +83,8 @@ class Client {
             previousDate == other.previousDate &&
             nextDate == other.nextDate &&
             const ListEquality().equals(images, other.images) &&
-            comment == other.comment;
+            comment == other.comment &&
+            actualTime == other.actualTime;
   }
 
   @override
@@ -95,7 +100,8 @@ class Client {
         'previousDate: $previousDate, '
         'nextDate: $nextDate, '
         'images: $images, '
-        'comment: $comment'
+        'comment: $comment, '
+        'actualTime: $actualTime'
         '}';
   }
 
@@ -112,6 +118,7 @@ class Client {
       nextDate: nextDate.isNotEmpty ? nextDate : null,
       images: images.isNotEmpty ? images.join(';') : null,
       comment: comment.isNotEmpty ? comment : null,
+      actualTime: actualTime?.toString(),
     );
   }
 
@@ -128,6 +135,8 @@ class Client {
       nextDate: entity.nextDate,
       images: entity.images?.split(';').toList() ?? [],
       comment: entity.comment,
+      actualTime:
+          entity.actualTime != null ? DateTime.parse(entity.actualTime!) : null,
     );
   }
 }
