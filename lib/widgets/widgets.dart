@@ -5,6 +5,7 @@ export 'client_card.dart';
 export 'drawer_app_bar.dart';
 export 'error_card.dart';
 export 'fabric_card.dart';
+export 'floating_label_container.dart';
 export 'info_snack_bar.dart';
 export 'loading_circle.dart';
 export 'order_card.dart';

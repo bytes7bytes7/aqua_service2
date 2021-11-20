@@ -25,6 +25,7 @@ class ClientCard extends StatelessWidget {
       hoverColor: theme.disabledColor,
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,
+        radius: constant_sizes.avatarRadius + 1,
         child: Padding(
           padding: const EdgeInsets.all(1.0),
           child: BlocProvider<AvatarBloc>(

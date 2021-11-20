@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../constants/sizes.dart' as constant_sizes;
+
 class PaddingTextFieldNotifier extends StatelessWidget {
   const PaddingTextFieldNotifier({
     Key? key,
@@ -25,7 +27,7 @@ class PaddingTextFieldNotifier extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(horizontal: 27.0, vertical: 16.0),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(35),
+              borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
               border: Border.all(
                 color: theme.primaryColor,
               ),

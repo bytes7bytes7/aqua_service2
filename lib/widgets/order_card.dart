@@ -45,6 +45,7 @@ class _OrderCardState extends State<OrderCard> {
       borderRadius: BorderRadius.circular(0),
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,
+        radius: constant_sizes.avatarRadius + 1,
         child: Padding(
           padding: const EdgeInsets.all(1.0),
           child: BlocProvider<AvatarBloc>(

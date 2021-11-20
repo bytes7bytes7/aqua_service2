@@ -49,7 +49,10 @@ class OrderListItem extends StatelessWidget {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.only(left: constant_sizes.avatarRadius),
+          padding: const EdgeInsets.only(
+              left: 2 *
+                  (constant_sizes.horizontalPadding +
+                      constant_sizes.avatarRadius)),
           child: Column(
             children: [
               Divider(
@@ -75,7 +78,9 @@ class OrderListItem extends StatelessWidget {
                     Text(
                       '$profit',
                       style: theme.textTheme.headline2!.copyWith(
-                          color: profit >= 0 ? theme.primaryColor : theme.errorColor),
+                          color: profit >= 0
+                              ? theme.primaryColor
+                              : theme.errorColor),
                     ),
                   ],
                 ),

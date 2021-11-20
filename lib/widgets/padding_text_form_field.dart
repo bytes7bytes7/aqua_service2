@@ -63,22 +63,28 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
         onChanged: widget.onChanged,
         decoration: InputDecoration(
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 27.0, vertical: 16.0),
+              const EdgeInsets.symmetric(horizontal: constant_sizes.textFieldHorPadding, vertical: constant_sizes.textFieldVerPadding),
           labelText: widget.title,
           alignLabelWithHint: true,
           labelStyle:
               theme.textTheme.bodyText1!.copyWith(color: theme.disabledColor),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: theme.disabledColor,
+            ),
+            borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
+          ),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: theme.primaryColor,
             ),
-            borderRadius: BorderRadius.circular(35),
+            borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
           ),
           border: OutlineInputBorder(
             borderSide: BorderSide(
               color: theme.disabledColor,
             ),
-            borderRadius: BorderRadius.circular(35),
+            borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
           ),
           suffixIcon: widget.isPhoneNumber
               ? Container(

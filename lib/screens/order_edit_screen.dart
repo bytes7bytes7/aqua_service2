@@ -7,6 +7,8 @@ import 'package:image_repository/image_repository.dart';
 
 import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
+import '../constants/sizes.dart' as constant_sizes;
+import '../constants/tooltips.dart' as constant_tooltips;
 
 class OrderEditScreen extends StatelessWidget {
   const OrderEditScreen({
@@ -119,15 +121,6 @@ class __BodyState extends State<_Body> {
             }
           },
           onSave: () {
-            orderBloc.add(OrderAddEvent(Order(
-              client: Client(id: 1),
-              price: 123,
-              fabrics: [
-                Fabric(id: 1),
-                Fabric(id: 2),
-              ],
-            )));
-            return;
             final currentState = _formKey.currentState;
             if (currentState != null && currentState.validate()) {
               currentState.save();
@@ -157,47 +150,101 @@ class __BodyState extends State<_Body> {
               key: _formKey,
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: CircleAvatar(
-                      backgroundColor: theme.primaryColor,
-                      radius: 46,
-                      child: BlocBuilder<AvatarBloc, AvatarState>(
-                        builder: (BuildContext context, AvatarState state) {
-                          if (state is AvatarLoadingState) {
-                            return const SizedBox.shrink();
-                          } else if (state is AvatarDataState) {
-                            modOrder.client.avatarPath = state.path;
-                            if (state.avatar.isEmpty) {
-                              return CircleAvatar(
-                                backgroundColor: theme.scaffoldBackgroundColor,
-                                radius: 45,
-                                child: Text(
-                                  modOrder.client.name.isNotEmpty
-                                      ? modOrder.client.name[0]
-                                      : '?',
-                                  style: theme.textTheme.headline3!
-                                      .copyWith(color: theme.primaryColor),
-                                ),
-                              );
-                            }
-                            return CircleAvatar(
-                              backgroundColor: theme.scaffoldBackgroundColor,
-                              radius: 45,
-                              foregroundImage: MemoryImage(state.avatar),
-                            );
-                          } else {
-                            return CircleAvatar(
-                              backgroundColor: theme.scaffoldBackgroundColor,
-                              radius: 45,
-                              child: Icon(
-                                Icons.warning_amber_outlined,
-                                color: theme.errorColor,
-                              ),
-                            );
-                          }
-                        },
-                      ),
+                  const SizedBox(height: 20.0),
+                  FloatingLabelContainer(
+                    text: 'Клиент',
+                    style: theme.textTheme.bodyText1!
+                        .copyWith(color: theme.disabledColor),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: constant_sizes.textFieldHorPadding,
+                      vertical: constant_sizes.textFieldVerPadding,
+                    ),
+                    backgroundColor: theme.scaffoldBackgroundColor,
+                    borderColor: theme.disabledColor,
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: theme.primaryColor,
+                          radius: constant_sizes.avatarRadius,
+                          child: Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: BlocBuilder<AvatarBloc, AvatarState>(
+                              builder:
+                                  (BuildContext context, AvatarState state) {
+                                if (state is AvatarLoadingState) {
+                                  return const SizedBox.shrink();
+                                } else if (state is AvatarDataState) {
+                                  modOrder.client.avatarPath = state.path;
+                                  if (state.avatar.isEmpty) {
+                                    return CircleAvatar(
+                                      backgroundColor:
+                                          theme.scaffoldBackgroundColor,
+                                      radius: constant_sizes.avatarRadius,
+                                      child: Text(
+                                        modOrder.client.name.isNotEmpty
+                                            ? modOrder.client.name[0]
+                                            : '?',
+                                        style: theme.textTheme.headline1!
+                                            .copyWith(
+                                                color: theme.primaryColor),
+                                      ),
+                                    );
+                                  }
+                                  return CircleAvatar(
+                                    backgroundColor:
+                                        theme.scaffoldBackgroundColor,
+                                    radius: constant_sizes.avatarRadius,
+                                    foregroundImage: MemoryImage(state.avatar),
+                                  );
+                                } else {
+                                  return CircleAvatar(
+                                    backgroundColor:
+                                        theme.scaffoldBackgroundColor,
+                                    radius: constant_sizes.avatarRadius / 2,
+                                    child: Icon(
+                                      Icons.warning_amber_outlined,
+                                      color: theme.errorColor,
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10.0),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              modOrder.client.name,
+                              style: theme.textTheme.headline2,
+                            ),
+                            Text(
+                              modOrder.client.city,
+                              style: theme.textTheme.subtitle1,
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        // IconButton does not work here
+                        Tooltip(
+                          message: constant_tooltips.choose,
+                          child: RawMaterialButton(
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            padding: const EdgeInsets.all(8),
+                            constraints:
+                                const BoxConstraints(minWidth: 0, minHeight: 0),
+                            splashColor: theme.primaryColor.withOpacity(0.3),
+                            child: Icon(
+                              Icons.edit,
+                              color: theme.primaryColor,
+                            ),
+                            shape: const CircleBorder(),
+                            onPressed: () {},
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   PaddingTextFormField(
