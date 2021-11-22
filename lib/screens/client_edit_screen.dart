@@ -307,7 +307,7 @@ class __BodyState extends State<_Body> {
                   PaddingTextFormField(
                     title: 'Телефон',
                     value: modClient.phone,
-                    isPhoneNumber: true,
+                    suffixIconType: SuffixIconType.phone,
                     keyboardType: TextInputType.number,
                     onChanged: (String value) {
                       modClient.phone = value;

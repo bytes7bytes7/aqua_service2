@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:order_repository/order_repository.dart';
-import 'package:client_repository/client_repository.dart';
-import 'package:fabric_repository/fabric_repository.dart';
 import 'package:image_repository/image_repository.dart';
 
 import '../blocs/blocs.dart';
@@ -42,6 +41,7 @@ class _Body extends StatefulWidget {
 }
 
 class __BodyState extends State<_Body> {
+  late final SlidableController slidableController;
   late final ValueNotifier<bool> isCreated;
   late final ValueNotifier<bool> isDone;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -54,6 +54,7 @@ class __BodyState extends State<_Body> {
 
   @override
   void initState() {
+    slidableController = SlidableController();
     isCreated = ValueNotifier(widget.order.id != null);
     isDone = ValueNotifier(widget.order.done);
     modOrder = Order.from(widget.order);
@@ -80,7 +81,6 @@ class __BodyState extends State<_Body> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final size = MediaQuery.of(context).size;
 
     void calcProfit() {
       try {
@@ -235,7 +235,7 @@ class __BodyState extends State<_Body> {
                             padding: const EdgeInsets.all(8),
                             constraints:
                                 const BoxConstraints(minWidth: 0, minHeight: 0),
-                            splashColor: theme.primaryColor.withOpacity(0.3),
+                            splashColor: theme.disabledColor.withOpacity(0.3),
                             child: Icon(
                               Icons.edit,
                               color: theme.primaryColor,
@@ -296,7 +296,9 @@ class __BodyState extends State<_Body> {
                   ),
                   PaddingTextFormField(
                     title: 'Дата',
-                    value: '', // modOrder.date
+                    value: '',
+                    // modOrder.date
+                    suffixIconType: SuffixIconType.calendar,
                     onChanged: (String value) {
                       // modOrder.date = value;
                     },
@@ -305,6 +307,60 @@ class __BodyState extends State<_Body> {
                         return 'Заполните поле';
                       }
                     },
+                  ),
+                  FloatingLabelContainer(
+                    text: 'Материалы',
+                    style: theme.textTheme.bodyText1!
+                        .copyWith(color: theme.disabledColor),
+                    borderColor: theme.disabledColor,
+                    backgroundColor: theme.scaffoldBackgroundColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: constant_sizes.textFieldVerPadding,
+                      vertical: constant_sizes.textFieldVerPadding,
+                    ),
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount:
+                            modOrder.fabrics.length + (modOrder.done ? 0 : 1),
+                        separatorBuilder: (context, index) {
+                          return Divider(
+                            color: theme.disabledColor,
+                            thickness: 1,
+                            height: 1,
+                          );
+                        },
+                        itemBuilder: (context, index) {
+                          if (index == 0 && !modOrder.done) {
+                            return Container(
+                              alignment: Alignment.center,
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 18.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Добавить',
+                                    style: theme.textTheme.headline2!
+                                        .copyWith(color: theme.primaryColor),
+                                  ),
+                                  Icon(
+                                    Icons.add,
+                                    color: theme.primaryColor,
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                          return FabricListItem(
+                            fabric: modOrder
+                                .fabrics[index - (modOrder.done ? 0 : 1)],
+                            controller: slidableController,
+                          );
+                        },
+                      ),
+                    ),
                   ),
                   PaddingTextFieldNotifier(
                     title: 'Прибыль',
@@ -330,7 +386,7 @@ class __BodyState extends State<_Body> {
                         child: WideButton(
                           isActive: isCreated.value && !value,
                           isPositive: true,
-                          title: 'Завершить',
+                          title: isDone.value ? 'Завершен' : 'Завершить',
                           onPressed: () {
                             showAskBottomSheet(
                               context: context,

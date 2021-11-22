@@ -7,6 +7,12 @@ import '../constants/tooltips.dart' as constant_tooltips;
 typedef VoidStringCallBack = void Function(String);
 typedef ValidatorCallback = String? Function(String?);
 
+enum SuffixIconType {
+  none,
+  phone,
+  calendar,
+}
+
 class PaddingTextFormField extends StatefulWidget {
   const PaddingTextFormField({
     Key? key,
@@ -14,8 +20,8 @@ class PaddingTextFormField extends StatefulWidget {
     required this.value,
     this.validator,
     this.onChanged,
-    this.isPhoneNumber = false,
     this.keyboardType = TextInputType.name,
+    this.suffixIconType = SuffixIconType.none,
     this.expands = false,
   }) : super(key: key);
 
@@ -23,8 +29,8 @@ class PaddingTextFormField extends StatefulWidget {
   final String? value;
   final ValidatorCallback? validator;
   final VoidStringCallBack? onChanged;
-  final bool isPhoneNumber;
   final TextInputType keyboardType;
+  final SuffixIconType suffixIconType;
   final bool expands;
 
   @override
@@ -62,8 +68,9 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
         validator: widget.validator,
         onChanged: widget.onChanged,
         decoration: InputDecoration(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: constant_sizes.textFieldHorPadding, vertical: constant_sizes.textFieldVerPadding),
+          contentPadding: const EdgeInsets.symmetric(
+              horizontal: constant_sizes.textFieldHorPadding,
+              vertical: constant_sizes.textFieldVerPadding),
           labelText: widget.title,
           alignLabelWithHint: true,
           labelStyle:
@@ -86,7 +93,7 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
             ),
             borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
           ),
-          suffixIcon: widget.isPhoneNumber
+          suffixIcon: (widget.suffixIconType == SuffixIconType.phone)
               ? Container(
                   margin: const EdgeInsets.only(right: 10),
                   child: IconButton(
@@ -101,7 +108,20 @@ class _PaddingTextFormFieldState extends State<PaddingTextFormField> {
                     },
                   ),
                 )
-              : null,
+              : (widget.suffixIconType == SuffixIconType.calendar)
+                  ? Container(
+                      margin: const EdgeInsets.only(right: 10),
+                      child: IconButton(
+                        icon: const Icon(Icons.date_range),
+                        color: theme.primaryColor,
+                        tooltip: constant_tooltips.calendar,
+                        splashRadius: constant_sizes.splashRadius,
+                        onPressed: () {
+                          // TODO: add routing to CalendarScreen
+                        },
+                      ),
+                    )
+                  : null,
         ),
       ),
     );

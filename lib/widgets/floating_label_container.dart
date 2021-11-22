@@ -49,8 +49,7 @@ class FloatingLabelContainer extends StatelessWidget {
             top: 0,
             left: constant_sizes.textFieldHorPadding / 2,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: constant_sizes.textFieldHorPadding / 2),
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               color: backgroundColor,
               child: Text(
                 text,
