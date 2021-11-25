@@ -30,7 +30,11 @@ class RouteGenerator {
           ),
         );
       case constant_routes.fabrics:
-        return _left(const FabricsScreen());
+        return _left(
+          FabricsScreen(
+            selected: args['selected'],
+          ),
+        );
       case constant_routes.fabricEdit:
         return _up(
           FabricEditScreen(fabric: args['fabric']),

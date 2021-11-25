@@ -35,19 +35,20 @@ class SQLiteOrderRepository implements OrderRepository {
     return Stream.fromFuture(
       SQLiteDatabase.instance.getNotes(constants.table).then(
         (lst) async {
-          Map<int, List<Order>> map = {};
+          Map<int, List<Order>> data = {};
           for (Map<String, Object?> m in lst) {
             Order o = Order.fromEntity(OrderEntity.fromMap(m));
             o.client = await SQLiteClientRepository().getClient(o.client.id!);
             List<int> fabrics = o.fabrics.map((e) => e.id!).toList();
             o.fabrics = await SQLiteFabricRepository().getFabrics(fabrics);
-            if (map.containsKey(o.client.id)) {
-              (map[o.client.id] as List).add(o);
+            if (data.containsKey(o.client.id)) {
+              (data[o.client.id] as List).add(o);
             } else {
-              map[o.client.id!] = [o];
+              data[o.client.id!] = [o];
             }
           }
-          return map;
+          // TODO: add sorting by client's name
+          return data;
         },
       ),
     );

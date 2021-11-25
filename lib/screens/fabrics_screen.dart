@@ -9,55 +9,64 @@ import '../constants/routes.dart' as constant_routes;
 import '../constants/tooltips.dart' as constant_tooltips;
 
 class FabricsScreen extends StatelessWidget {
-  const FabricsScreen({Key? key}) : super(key: key);
+  const FabricsScreen({
+    Key? key,
+    this.selected,
+  }) : super(key: key);
+
+  final List<Fabric>? selected;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fabricBloc = context.read<FabricBloc>();
-    return Scaffold(
-      appBar: const DrawerAppBar(title: 'Материалы'),
-      drawer: const AppDrawer(),
-      body: BlocBuilder<FabricBloc, FabricState>(
-        builder: (BuildContext context, FabricState state) {
-          if (state is FabricLoadingState) {
-            return const LoadingCircle();
-          } else if (state is FabricDataState) {
-            return _FabricList(
-              items: state.fabrics,
-            );
-          } else if (state is FabricErrorState) {
-            return ErrorCard(
-              error: state.error,
-              onRefresh: () {
-                fabricBloc.add(FabricLoadEvent());
-              },
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        },
-      ),
-      floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
-        builder: (BuildContext context, FabricState state) {
-          if (state is FabricDataState) {
-            return FloatingActionButton(
-              tooltip: constant_tooltips.add,
-              backgroundColor: theme.primaryColor,
-              child: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.of(context).pushNamed(
-                  constant_routes.fabricEdit,
-                  arguments: {
-                    'fabric' : Fabric(),
-                  },
-                );
-              },
-            );
-          } else {
-            return const SizedBox.shrink();
-          }
-        },
+    return FabricsInherited(
+      selected: selected ?? [],
+      isChoice: selected != null,
+      child: Scaffold(
+        appBar: const DrawerAppBar(title: 'Материалы'),
+        drawer: const AppDrawer(),
+        body: BlocBuilder<FabricBloc, FabricState>(
+          builder: (BuildContext context, FabricState state) {
+            if (state is FabricLoadingState) {
+              return const LoadingCircle();
+            } else if (state is FabricDataState) {
+              return _FabricList(
+                items: state.fabrics,
+              );
+            } else if (state is FabricErrorState) {
+              return ErrorCard(
+                error: state.error,
+                onRefresh: () {
+                  fabricBloc.add(FabricLoadEvent());
+                },
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
+        floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
+          builder: (BuildContext context, FabricState state) {
+            if (state is FabricDataState) {
+              return FloatingActionButton(
+                tooltip: constant_tooltips.add,
+                backgroundColor: theme.primaryColor,
+                child: const Icon(Icons.add),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    constant_routes.fabricEdit,
+                    arguments: {
+                      'fabric': Fabric(),
+                    },
+                  );
+                },
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
       ),
     );
   }
@@ -82,6 +91,11 @@ class __FabricListState extends State<_FabricList> {
   void initState() {
     slidableController = SlidableController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

@@ -41,6 +41,7 @@ class _OrderCardState extends State<OrderCard> {
     return ExpansionTileCard(
       key: cardKey,
       elevation: 0,
+      baseColor: theme.scaffoldBackgroundColor,
       borderRadius: BorderRadius.circular(0),
       leading: CircleAvatar(
         backgroundColor: theme.primaryColor,

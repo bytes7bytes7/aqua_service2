@@ -1,5 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:flutter/widgets.dart';
 
 void main() => runApp(const MyApp());
 
@@ -9,56 +11,85 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: 'ExpansionTileCard Demo',
-      home: MyHomePage(),
+      title: 'InheritedWidget Example',
+      home: Scaffold(
+        body: InheritedWidgetExample(),
+      ),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class InheritedWidgetExample extends StatefulWidget {
+  const InheritedWidgetExample({Key? key}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _InheritedWidgetExampleState createState() => _InheritedWidgetExampleState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final GlobalKey<ExpansionTileCardState> cardA = GlobalKey();
+class _InheritedWidgetExampleState extends State<InheritedWidgetExample> {
+  final Random _random = Random();
+  int _score = 10;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: ExpansionTileCard(
-          key: cardA,
-          leading: const CircleAvatar(child: Text('A')),
-          title: const Text('Tap me!'),
-          subtitle: const Text('I expand!'),
-          children: <Widget>[
-            const Divider(
-              thickness: 1.0,
-              height: 1.0,
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          InfoInherited(
+            score: _score,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.score),
+                CurrentScore(),
+              ],
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 8.0,
-                ),
-                child: Text(
-                  """Hi there, I'm a drop-in replacement for Flutter's ExpansionTile.\n\nUse me any time you think your app could benefit from being just a bit more Material.\n\nThese buttons control the next card down!""",
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyText2!
-                      .copyWith(fontSize: 16),
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+          OutlinedButton(
+            child: const Text('Change'),
+            onPressed: () {
+              setState(() {
+                _score = _random.nextInt(100);
+              });
+            },
+          ),
+        ],
       ),
     );
+  }
+}
+
+class InfoInherited extends InheritedWidget {
+  const InfoInherited({
+    Key? key,
+    required this.score,
+    required Widget child,
+  }) : super(key: key, child: child);
+
+  final int score;
+
+  static InfoInherited of(BuildContext context) {
+    final InfoInherited? result =
+        context.dependOnInheritedWidgetOfExactType<InfoInherited>();
+    assert(result != null, 'No InfoInherited found in context');
+    return result!;
+  }
+
+  @override
+  bool updateShouldNotify(covariant InfoInherited oldWidget) {
+    return oldWidget.score != score;
+  }
+}
+
+class CurrentScore extends StatelessWidget {
+  const CurrentScore({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    print('CurrentScore rebuilt');
+    final InfoInherited info = InfoInherited.of(context);
+
+    return Text(info.score.toString());
   }
 }

@@ -8,6 +8,7 @@ import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
 import '../constants/sizes.dart' as constant_sizes;
 import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/routes.dart' as constant_routes;
 
 class OrderEditScreen extends StatelessWidget {
   const OrderEditScreen({
@@ -122,7 +123,12 @@ class __BodyState extends State<_Body> {
           },
           onSave: () {
             final currentState = _formKey.currentState;
-            if (currentState != null && currentState.validate()) {
+            if (modOrder.client.id == null) {
+              // TODO: add client validator
+            }
+            if (currentState != null &&
+                currentState.validate() &&
+                modOrder.client.id != null) {
               currentState.save();
               modOrder.id ??= savedOrder.id;
               savedOrder = Order.from(modOrder);
@@ -151,6 +157,7 @@ class __BodyState extends State<_Body> {
               child: Column(
                 children: [
                   const SizedBox(height: 20.0),
+                  // TODO: add navigation to ClientEditScreen
                   FloatingLabelContainer(
                     text: 'Клиент',
                     style: theme.textTheme.bodyText1!
@@ -241,7 +248,9 @@ class __BodyState extends State<_Body> {
                               color: theme.primaryColor,
                             ),
                             shape: const CircleBorder(),
-                            onPressed: () {},
+                            onPressed: () {
+                              // TODO: add navigation to ClientsScreen
+                            },
                           ),
                         ),
                       ],
@@ -333,23 +342,42 @@ class __BodyState extends State<_Body> {
                         },
                         itemBuilder: (context, index) {
                           if (index == 0 && !modOrder.done) {
-                            return Container(
-                              alignment: Alignment.center,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 18.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Добавить',
-                                    style: theme.textTheme.headline2!
-                                        .copyWith(color: theme.primaryColor),
+                            // TODO: if (fabrics.length == 0) { place "Add button" on the center }
+                            return Material(
+                              color: theme.scaffoldBackgroundColor,
+                              child: InkWell(
+                                splashColor: theme.disabledColor,
+                                onTap: () async {
+                                  await Navigator.of(context).pushNamed(
+                                    constant_routes.fabrics,
+                                    arguments: {
+                                      'selected': modOrder.fabrics,
+                                    },
+                                  );
+                                  setState(() {
+                                    // update fabrics
+                                  });
+                                },
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 18.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Добавить',
+                                        style: theme.textTheme.headline2!
+                                            .copyWith(
+                                                color: theme.primaryColor),
+                                      ),
+                                      Icon(
+                                        Icons.add,
+                                        color: theme.primaryColor,
+                                      ),
+                                    ],
                                   ),
-                                  Icon(
-                                    Icons.add,
-                                    color: theme.primaryColor,
-                                  ),
-                                ],
+                                ),
                               ),
                             );
                           }

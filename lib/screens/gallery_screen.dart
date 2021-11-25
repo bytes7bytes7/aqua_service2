@@ -21,6 +21,7 @@ class GalleryScreen extends StatefulWidget {
 }
 
 class _GalleryScreenState extends State<GalleryScreen> {
+  // TODO: remove bottom buttons
   late final PageController controller;
   late final ValueNotifier<int> indexNotifier;
 

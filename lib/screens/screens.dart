@@ -1,4 +1,5 @@
 export 'about_screen.dart';
+export 'calendar_screen.dart';
 export 'client_edit_screen.dart';
 export 'clients_screen.dart';
 export 'fabric_edit_screen.dart';
