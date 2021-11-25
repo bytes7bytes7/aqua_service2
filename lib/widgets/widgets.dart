@@ -5,7 +5,6 @@ export 'client_card.dart';
 export 'drawer_app_bar.dart';
 export 'error_card.dart';
 export 'fabric_card.dart';
-export 'fabric_list_item.dart';
 export 'fabrics_inherited.dart';
 export 'floating_label_container.dart';
 export 'info_snack_bar.dart';

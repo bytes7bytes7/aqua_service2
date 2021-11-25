@@ -324,69 +324,92 @@ class __BodyState extends State<_Body> {
                     borderColor: theme.disabledColor,
                     backgroundColor: theme.scaffoldBackgroundColor,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: constant_sizes.textFieldVerPadding,
+                      //horizontal: constant_sizes.textFieldVerPadding,
                       vertical: constant_sizes.textFieldVerPadding,
                     ),
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
-                      child: ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount:
-                            modOrder.fabrics.length + (modOrder.done ? 0 : 1),
-                        separatorBuilder: (context, index) {
-                          return Divider(
-                            color: theme.disabledColor,
-                            thickness: 1,
-                            height: 1,
-                          );
-                        },
-                        itemBuilder: (context, index) {
-                          if (index == 0 && !modOrder.done) {
-                            // TODO: if (fabrics.length == 0) { place "Add button" on the center }
-                            return Material(
-                              color: theme.scaffoldBackgroundColor,
-                              child: InkWell(
-                                splashColor: theme.disabledColor,
-                                onTap: () async {
-                                  await Navigator.of(context).pushNamed(
-                                    constant_routes.fabrics,
-                                    arguments: {
-                                      'selected': modOrder.fabrics,
+                      child: FabricsInherited(
+                        selected: modOrder.fabrics,
+                        child: Builder(builder: (context) {
+                          final fabricsInherited = FabricsInherited.of(context);
+                          return ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: modOrder.fabrics.length +
+                                (!modOrder.done || modOrder.fabrics.isEmpty
+                                    ? 1
+                                    : 0),
+                            separatorBuilder: (context, index) {
+                              return Divider(
+                                color: theme.disabledColor,
+                                thickness: 1,
+                                height: 1,
+                                indent: constant_sizes.textFieldVerPadding,
+                                endIndent: constant_sizes.textFieldVerPadding,
+                              );
+                            },
+                            itemBuilder: (context, index) {
+                              if (index == 0 && !modOrder.done) {
+                                // TODO: if (fabrics.length == 0) { place "Add button" on the center }
+                                return Material(
+                                  color: theme.scaffoldBackgroundColor,
+                                  child: InkWell(
+                                    splashColor: theme.disabledColor,
+                                    onTap: () async {
+                                      await Navigator.of(context).pushNamed(
+                                        constant_routes.fabrics,
+                                        arguments: {
+                                          'fabricsInherited': fabricsInherited,
+                                        },
+                                      );
+                                      setState(() {
+                                        // update fabrics
+                                      });
                                     },
-                                  );
-                                  setState(() {
-                                    // update fabrics
-                                  });
-                                },
-                                child: Container(
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 18.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Добавить',
+                                            style: theme.textTheme.headline2!
+                                                .copyWith(
+                                                    color: theme.primaryColor),
+                                          ),
+                                          Icon(
+                                            Icons.add,
+                                            color: theme.primaryColor,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              } else if (index == 0) {
+                                // TODO: place it on the center
+                                return Container(
                                   alignment: Alignment.center,
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 18.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        'Добавить',
-                                        style: theme.textTheme.headline2!
-                                            .copyWith(
-                                                color: theme.primaryColor),
-                                      ),
-                                      Icon(
-                                        Icons.add,
-                                        color: theme.primaryColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          return FabricListItem(
-                            fabric: modOrder
-                                .fabrics[index - (modOrder.done ? 0 : 1)],
-                            controller: slidableController,
+                                  child: Text('Пусто',
+                                      style: theme.textTheme.bodyText1!
+                                          .copyWith(
+                                              color: theme.disabledColor)),
+                                );
+                              }
+                              return FabricCard(
+                                fabric: modOrder
+                                    .fabrics[index - (modOrder.done ? 0 : 1)],
+                                controller: slidableController,
+                                fabricsInherited: fabricsInherited,
+                              );
+                            },
                           );
-                        },
+                        }),
                       ),
                     ),
                   ),

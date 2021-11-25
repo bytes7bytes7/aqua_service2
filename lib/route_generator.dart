@@ -32,7 +32,7 @@ class RouteGenerator {
       case constant_routes.fabrics:
         return _left(
           FabricsScreen(
-            selected: args['selected'],
+            fabricsInherited: args['fabricsInherited'],
           ),
         );
       case constant_routes.fabricEdit:

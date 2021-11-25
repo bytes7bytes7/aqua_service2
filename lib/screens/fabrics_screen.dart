@@ -7,24 +7,32 @@ import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
 import '../constants/routes.dart' as constant_routes;
 import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/sizes.dart' as constant_sizes;
 
 class FabricsScreen extends StatelessWidget {
   const FabricsScreen({
     Key? key,
-    this.selected,
+    this.fabricsInherited,
   }) : super(key: key);
 
-  final List<Fabric>? selected;
+  final FabricsInherited? fabricsInherited;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fabricBloc = context.read<FabricBloc>();
     return FabricsInherited(
-      selected: selected ?? [],
-      isChoice: selected != null,
+      selected: fabricsInherited?.selected ?? [],
       child: Scaffold(
-        appBar: const DrawerAppBar(title: 'Материалы'),
+        appBar: PreferredSize(
+          preferredSize:
+              const Size.fromHeight(constant_sizes.preferredSizeHeight),
+          child: (fabricsInherited != null)
+              ? const BackAppBar(
+                  title: 'Материалы',
+                )
+              : const DrawerAppBar(title: 'Материалы'),
+        ),
         drawer: const AppDrawer(),
         body: BlocBuilder<FabricBloc, FabricState>(
           builder: (BuildContext context, FabricState state) {
@@ -33,6 +41,7 @@ class FabricsScreen extends StatelessWidget {
             } else if (state is FabricDataState) {
               return _FabricList(
                 items: state.fabrics,
+                fabricsInherited: fabricsInherited,
               );
             } else if (state is FabricErrorState) {
               return ErrorCard(
@@ -76,9 +85,11 @@ class _FabricList extends StatefulWidget {
   const _FabricList({
     Key? key,
     required this.items,
+    required this.fabricsInherited,
   }) : super(key: key);
 
   final List items;
+  final FabricsInherited? fabricsInherited;
 
   @override
   __FabricListState createState() => __FabricListState();
@@ -101,7 +112,6 @@ class __FabricListState extends State<_FabricList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fabricBloc = context.read<FabricBloc>();
     if (widget.items.isEmpty) {
       return Center(
         child: Text(
@@ -123,33 +133,10 @@ class __FabricListState extends State<_FabricList> {
       },
       itemBuilder: (context, index) {
         final item = widget.items[index];
-        return Slidable(
-          key: Key('${item.hashCode}'),
+        return FabricCard(
+          fabric: item,
           controller: slidableController,
-          direction: Axis.horizontal,
-          actionPane: const SlidableDrawerActionPane(),
-          actionExtentRatio: 0.25,
-          child: FabricCard(
-            fabric: item,
-          ),
-          secondaryActions: <Widget>[
-            IconSlideAction(
-              caption: 'Удалить',
-              color: theme.errorColor,
-              icon: Icons.delete,
-              onTap: () {
-                showAskBottomSheet(
-                  context: context,
-                  title: 'Вы действительно хотите удалить материал?',
-                  text1: 'Отмена',
-                  text2: 'Удалить',
-                  onPressed2: () {
-                    fabricBloc.add(FabricDeleteEvent(item));
-                  },
-                );
-              },
-            ),
-          ],
+          fabricsInherited: widget.fabricsInherited,
         );
       },
     );

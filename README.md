@@ -1,3 +1,3 @@
 # Aqua Service (with Bloc)
 
-Aqua service app remade with bloc package
+Aqua service app remaded with bloc package

@@ -8,35 +8,31 @@ class FabricsInherited extends InheritedWidget {
     Key? key,
     required Widget child,
     required List<Fabric> selected,
-    required bool isChoice,
   })  : _selected = selected,
-        _isChoice = isChoice,
         super(key: key, child: child);
 
   final List<Fabric> _selected;
-  final bool _isChoice;
 
   List<Fabric> get selected => _selected;
-  bool get isChoice => _isChoice;
 
   void addItem(Fabric item) {
-    if (!_selected.contains(item)) {
-      _selected.add(item);
-    }
+    _selected.add(item);
   }
 
   void setItems(Iterable<Fabric> items) {
-    clearItems();
+    clear();
     _selected.addAll(items);
   }
 
-  void removeItem(Fabric item) {
-    if (_selected.contains(item)) {
-      _selected.remove(item);
-    }
+  void removeOneItem(Fabric item) {
+    _selected.remove(_selected.firstWhere((e) => e.id == item.id));
   }
 
-  void clearItems() {
+  void removeAllItems(Fabric item) {
+    _selected.removeWhere((e) => e.id == item.id);
+  }
+
+  void clear() {
     _selected.clear();
   }
 

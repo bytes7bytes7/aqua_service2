@@ -12,7 +12,7 @@ class DrawerAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
   @override
-  Size get preferredSize => const Size.fromHeight(56.0);
+  Size get preferredSize => const Size.fromHeight(constant_sizes.preferredSizeHeight);
 
   @override
   Widget build(BuildContext context) {

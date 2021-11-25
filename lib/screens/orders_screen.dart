@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_repository/order_repository.dart';
-import 'package:client_repository/client_repository.dart';
-import 'package:fabric_repository/fabric_repository.dart';
 
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';

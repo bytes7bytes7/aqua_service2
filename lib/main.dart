@@ -57,6 +57,12 @@ class App extends StatelessWidget {
         theme: lightTheme,
         debugShowCheckedModeBanner: false,
         initialRoute: constant_routes.orders,
+        onGenerateInitialRoutes: (String? route) {
+          return [
+            RouteGenerator.generateRoute(
+                const RouteSettings(name: constant_routes.orders))
+          ];
+        },
         onGenerateRoute: RouteGenerator.generateRoute,
       ),
     );

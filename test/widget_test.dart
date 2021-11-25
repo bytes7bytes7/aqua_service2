@@ -87,7 +87,6 @@ class CurrentScore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('CurrentScore rebuilt');
     final InfoInherited info = InfoInherited.of(context);
 
     return Text(info.score.toString());
