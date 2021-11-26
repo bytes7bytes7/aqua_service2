@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:order_repository/order_repository.dart';
 import 'package:image_repository/image_repository.dart';
+import 'package:client_repository/client_repository.dart';
 import 'package:fabric_repository/fabric_repository.dart';
 
 import '../blocs/blocs.dart';
@@ -48,6 +49,7 @@ class __BodyState extends State<_Body> {
   late final ValueNotifier<bool> isDone;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final ValueNotifier<String> profitNotifier;
+  late final ValueNotifier<Client> clientNotifier;
   late final ValueNotifier<List<Fabric>> fabricsNotifier;
   late final Order modOrder;
   late Order savedOrder;
@@ -63,13 +65,14 @@ class __BodyState extends State<_Body> {
     modOrder = Order.from(widget.order);
     savedOrder = Order.from(widget.order);
     profitNotifier = ValueNotifier((widget.order.price -
-            widget.order.expenses +
-            widget.order.fabrics.fold(0,
+        widget.order.expenses +
+        widget.order.fabrics.fold(0,
                 (prev, curr) => prev + curr.retailPrice - curr.purchasePrice))
         .toString());
-    fabricsNotifier = ValueNotifier(List.from(modOrder.fabrics))..addListener(() {
-      calcProfit();
-    });
+    clientNotifier = ValueNotifier(Client.from(modOrder.client))
+      ..addListener(updateClient);
+    fabricsNotifier = ValueNotifier(List.from(modOrder.fabrics))
+      ..addListener(calcProfit);
     orderBloc = context.read<OrderBloc>();
     avatarBloc = context.read<AvatarBloc>();
     avatarBloc.add(AvatarLoadEvent(modOrder.client.avatarPath));
@@ -81,8 +84,13 @@ class __BodyState extends State<_Body> {
     isCreated.dispose();
     isDone.dispose();
     profitNotifier.dispose();
+    clientNotifier.dispose();
     fabricsNotifier.dispose();
     super.dispose();
+  }
+
+  void updateClient() {
+    modOrder.client = Client.from(clientNotifier.value);
   }
 
   void calcProfit() {
@@ -90,10 +98,8 @@ class __BodyState extends State<_Body> {
     try {
       profitNotifier.value = (modOrder.price -
           modOrder.expenses +
-          modOrder.fabrics.fold(
-              0,
-                  (prev, curr) =>
-              prev + curr.retailPrice - curr.purchasePrice))
+          modOrder.fabrics.fold(0,
+                  (prev, curr) => prev + curr.retailPrice - curr.purchasePrice))
           .toString();
     } catch (e) {
       profitNotifier.value = '?';
@@ -171,103 +177,120 @@ class __BodyState extends State<_Body> {
                     style: theme.textTheme.bodyText1!
                         .copyWith(color: theme.disabledColor),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: constant_sizes.textFieldHorPadding,
-                      vertical: constant_sizes.textFieldVerPadding,
+                      horizontal: constant_sizes.textFieldHorPadding / 2,
+                      vertical: constant_sizes.textFieldVerPadding / 4,
                     ),
                     backgroundColor: theme.scaffoldBackgroundColor,
                     borderColor: theme.disabledColor,
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: theme.primaryColor,
-                          radius: constant_sizes.avatarRadius,
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: BlocBuilder<AvatarBloc, AvatarState>(
-                              builder:
-                                  (BuildContext context, AvatarState state) {
-                                if (state is AvatarLoadingState) {
-                                  return const SizedBox.shrink();
-                                } else if (state is AvatarDataState) {
-                                  modOrder.client.avatarPath = state.path;
-                                  if (state.avatar.isEmpty) {
-                                    return CircleAvatar(
-                                      backgroundColor:
-                                          theme.scaffoldBackgroundColor,
-                                      radius: constant_sizes.avatarRadius,
-                                      child: Text(
-                                        modOrder.client.name.isNotEmpty
-                                            ? modOrder.client.name[0]
-                                            : '?',
-                                        style: theme.textTheme.headline1!
-                                            .copyWith(
-                                                color: theme.primaryColor),
-                                      ),
-                                    );
-                                  }
-                                  return CircleAvatar(
-                                    backgroundColor:
-                                        theme.scaffoldBackgroundColor,
-                                    radius: constant_sizes.avatarRadius,
-                                    foregroundImage: MemoryImage(state.avatar),
-                                  );
-                                } else {
-                                  return CircleAvatar(
-                                    backgroundColor:
-                                        theme.scaffoldBackgroundColor,
-                                    radius: constant_sizes.avatarRadius / 2,
-                                    child: Icon(
-                                      Icons.warning_amber_outlined,
-                                      color: theme.errorColor,
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10.0),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    child: ValueListenableBuilder(
+                      valueListenable: clientNotifier,
+                      builder: (context, Client value, child) {
+                        return ClientCard(
+                          client: value,
+                          controller: slidableController,
+                          clientNotifier: clientNotifier,
+                        );
+                        return Row(
                           children: [
-                            Text(
-                              modOrder.client.name,
-                              style: theme.textTheme.headline2,
+                            CircleAvatar(
+                              backgroundColor: theme.primaryColor,
+                              radius: constant_sizes.avatarRadius,
+                              child: Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: BlocBuilder<AvatarBloc, AvatarState>(
+                                  builder: (BuildContext context,
+                                      AvatarState state) {
+                                    if (state is AvatarLoadingState) {
+                                      return const SizedBox.shrink();
+                                    } else if (state is AvatarDataState) {
+                                      modOrder.client.avatarPath = state.path;
+                                      if (state.avatar.isEmpty) {
+                                        return CircleAvatar(
+                                          backgroundColor:
+                                          theme.scaffoldBackgroundColor,
+                                          radius: constant_sizes.avatarRadius,
+                                          child: Text(
+                                            modOrder.client.name.isNotEmpty
+                                                ? modOrder.client.name[0]
+                                                : '?',
+                                            style: theme.textTheme.headline1!
+                                                .copyWith(
+                                                color: theme.primaryColor),
+                                          ),
+                                        );
+                                      }
+                                      return CircleAvatar(
+                                        backgroundColor:
+                                        theme.scaffoldBackgroundColor,
+                                        radius: constant_sizes.avatarRadius,
+                                        foregroundImage:
+                                        MemoryImage(state.avatar),
+                                      );
+                                    } else {
+                                      return CircleAvatar(
+                                        backgroundColor:
+                                        theme.scaffoldBackgroundColor,
+                                        radius: constant_sizes.avatarRadius / 2,
+                                        child: Icon(
+                                          Icons.warning_amber_outlined,
+                                          color: theme.errorColor,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
                             ),
-                            Text(
-                              modOrder.client.city,
-                              style: theme.textTheme.subtitle1,
+                            const SizedBox(width: 10.0),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  modOrder.client.name,
+                                  style: theme.textTheme.headline2,
+                                ),
+                                Text(
+                                  modOrder.client.city,
+                                  style: theme.textTheme.subtitle1,
+                                ),
+                              ],
+                            ),
+                            const Spacer(),
+                            // IconButton does not work here
+                            Tooltip(
+                              message: constant_tooltips.choose,
+                              child: RawMaterialButton(
+                                materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                                padding: const EdgeInsets.all(8),
+                                constraints: const BoxConstraints(
+                                    minWidth: 0, minHeight: 0),
+                                splashColor:
+                                theme.disabledColor.withOpacity(0.3),
+                                child: Icon(
+                                  Icons.edit,
+                                  color: theme.primaryColor,
+                                ),
+                                shape: const CircleBorder(),
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    constant_routes.clients,
+                                    arguments: {
+                                      'clientNotifier': clientNotifier,
+                                    },
+                                  );
+                                },
+                              ),
                             ),
                           ],
-                        ),
-                        const Spacer(),
-                        // IconButton does not work here
-                        Tooltip(
-                          message: constant_tooltips.choose,
-                          child: RawMaterialButton(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            padding: const EdgeInsets.all(8),
-                            constraints:
-                                const BoxConstraints(minWidth: 0, minHeight: 0),
-                            splashColor: theme.disabledColor.withOpacity(0.3),
-                            child: Icon(
-                              Icons.edit,
-                              color: theme.primaryColor,
-                            ),
-                            shape: const CircleBorder(),
-                            onPressed: () {
-                              // TODO: add navigation to ClientsScreen
-                            },
-                          ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
                   ),
                   PaddingTextFormField(
                     title: 'Стоимость',
                     value:
-                        (modOrder.price != 0) ? modOrder.price.toString() : '',
+                    (modOrder.price != 0) ? modOrder.price.toString() : '',
                     keyboardType: TextInputType.number,
                     onChanged: (String value) {
                       try {
@@ -338,84 +361,84 @@ class __BodyState extends State<_Body> {
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
                       child: ValueListenableBuilder(
-                          valueListenable: fabricsNotifier,
-                          builder: (context, List<Fabric> value, child) {
-                            List<Fabric> unique = List<Fabric>.from(value).toSet().toList();
-                            return ListView.separated(
-                              physics: const BouncingScrollPhysics(),
-                              itemCount: unique.length +
-                                  ((!modOrder.done || modOrder.fabrics.isEmpty)
-                                      ? 1
-                                      : 0),
-                              separatorBuilder: (context, index) {
-                                return Divider(
-                                  color: theme.disabledColor,
-                                  thickness: 1,
-                                  height: 1,
-                                  indent: constant_sizes.textFieldVerPadding,
-                                  endIndent: constant_sizes.textFieldVerPadding,
-                                );
-                              },
-                              itemBuilder: (context, index) {
-                                if (index == 0 && !modOrder.done) {
-                                  // TODO: if (fabrics.length == 0) { place "Add button" on the center }
-                                  return Material(
-                                    color: theme.scaffoldBackgroundColor,
-                                    child: InkWell(
-                                      splashColor: theme.disabledColor,
-                                      onTap: () {
-                                        Navigator.of(context).pushNamed(
-                                          constant_routes.fabrics,
-                                          arguments: {
-                                            'fabricsNotifier': fabricsNotifier,
-                                          },
-                                        );
-                                      },
-                                      child: Container(
-                                        alignment: Alignment.center,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 18.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              'Добавить',
-                                              style: theme.textTheme.headline2!
-                                                  .copyWith(
-                                                      color:
-                                                          theme.primaryColor),
-                                            ),
-                                            Icon(
-                                              Icons.add,
-                                              color: theme.primaryColor,
-                                            ),
-                                          ],
-                                        ),
+                        valueListenable: fabricsNotifier,
+                        builder: (context, List<Fabric> value, child) {
+                          List<Fabric> unique =
+                          List<Fabric>.from(value).toSet().toList();
+                          return ListView.separated(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: unique.length +
+                                ((!modOrder.done || modOrder.fabrics.isEmpty)
+                                    ? 1
+                                    : 0),
+                            separatorBuilder: (context, index) {
+                              return Divider(
+                                color: theme.disabledColor,
+                                thickness: 1,
+                                height: 1,
+                                indent: constant_sizes.textFieldVerPadding,
+                                endIndent: constant_sizes.textFieldVerPadding,
+                              );
+                            },
+                            itemBuilder: (context, index) {
+                              if (index == 0 && !modOrder.done) {
+                                // TODO: if (fabrics.length == 0) { place "Add button" on the center }
+                                return Material(
+                                  color: theme.scaffoldBackgroundColor,
+                                  child: InkWell(
+                                    splashColor: theme.disabledColor,
+                                    onTap: () {
+                                      Navigator.of(context).pushNamed(
+                                        constant_routes.fabrics,
+                                        arguments: {
+                                          'fabricsNotifier': fabricsNotifier,
+                                        },
+                                      );
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 18.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Добавить',
+                                            style: theme.textTheme.headline2!
+                                                .copyWith(
+                                                color: theme.primaryColor),
+                                          ),
+                                          Icon(
+                                            Icons.add,
+                                            color: theme.primaryColor,
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                } else if (index == 0) {
-                                  // TODO: place it on the center
-                                  return Container(
-                                    alignment: Alignment.center,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 18.0),
-                                    child: Text('Пусто',
-                                        style: theme.textTheme.bodyText1!
-                                            .copyWith(
-                                                color: theme.disabledColor)),
-                                  );
-                                }
-                                return FabricCard(
-                                  fabric:
-                                      unique[index - (modOrder.done ? 0 : 1)],
-                                  controller: slidableController,
-                                  fabricsNotifier: fabricsNotifier,
+                                  ),
                                 );
-                              },
-                            );
-                          }),
+                              } else if (index == 0) {
+                                // TODO: place it on the center
+                                return Container(
+                                  alignment: Alignment.center,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 18.0),
+                                  child: Text('Пусто',
+                                      style: theme.textTheme.bodyText1!
+                                          .copyWith(
+                                          color: theme.disabledColor)),
+                                );
+                              }
+                              return FabricCard(
+                                fabric: unique[index - (modOrder.done ? 0 : 1)],
+                                controller: slidableController,
+                                fabricsNotifier: fabricsNotifier,
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                   PaddingTextFieldNotifier(
@@ -447,7 +470,7 @@ class __BodyState extends State<_Body> {
                             showAskBottomSheet(
                               context: context,
                               title:
-                                  'Завершить заказ?\nОтменить действие будет невозможно!',
+                              'Завершить заказ?\nОтменить действие будет невозможно!',
                               text1: 'Отмена',
                               text2: 'Завершить',
                               onPressed2: () {

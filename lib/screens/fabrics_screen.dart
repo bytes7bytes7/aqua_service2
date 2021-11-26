@@ -129,9 +129,8 @@ class __FabricListState extends State<_FabricList> {
         );
       },
       itemBuilder: (context, index) {
-        final item = widget.items[index];
         return FabricCard(
-          fabric: item,
+          fabric: widget.items[index],
           controller: slidableController,
           fabricsNotifier: widget.fabricsNotifier,
         );

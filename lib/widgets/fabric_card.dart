@@ -24,14 +24,11 @@ class FabricCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fabricBloc = context.read<FabricBloc>();
-
     ValueNotifier<int> amount = ValueNotifier(0);
-
     if (fabricsNotifier != null) {
       amount.value =
           fabricsNotifier!.value.where((e) => e.id == fabric.id).length;
     }
-
     return Slidable(
       key: Key('${fabric.hashCode}'),
       controller: controller,

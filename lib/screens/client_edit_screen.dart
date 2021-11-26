@@ -55,6 +55,7 @@ class __BodyState extends State<_Body> {
   late Client savedClient;
 
   late final ClientBloc clientBloc;
+  late final OrderBloc orderBloc;
   late final AvatarBloc avatarBloc;
   late final GalleryBloc galleryBloc;
 
@@ -64,6 +65,7 @@ class __BodyState extends State<_Body> {
     modClient = Client.from(widget.client);
     savedClient = Client.from(widget.client);
     clientBloc = context.read<ClientBloc>();
+    orderBloc = context.read<OrderBloc>();
     avatarBloc = context.read<AvatarBloc>();
     galleryBloc = context.read<GalleryBloc>();
     avatarBloc.add(AvatarLoadEvent(modClient.avatarPath));
@@ -117,6 +119,8 @@ class __BodyState extends State<_Body> {
                 isCreated.value = true;
                 clientBloc.add(ClientAddEvent(savedClient));
               }
+              // update OrderBloc
+              orderBloc.add(OrderLoadEvent());
               ScaffoldMessenger.of(context)
                 ..removeCurrentSnackBar()
                 ..showSnackBar(

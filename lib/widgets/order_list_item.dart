@@ -33,7 +33,6 @@ class OrderListItem extends StatelessWidget {
 
     int profit = order.price - order.expenses;
     for (Fabric f in order.fabrics) {
-      print('Fabric\' id: ${f.id}');
       final retailPrice = f.retailPrice;
       final purchasePrice = f.purchasePrice;
       profit += retailPrice - purchasePrice;

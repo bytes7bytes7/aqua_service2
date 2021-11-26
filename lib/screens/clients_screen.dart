@@ -1,22 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:client_repository/client_repository.dart';
 
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
 import '../constants/routes.dart' as constant_routes;
 import '../constants/tooltips.dart' as constant_tooltips;
+import '../constants/sizes.dart' as constant_sizes;
 
 class ClientsScreen extends StatelessWidget {
-  const ClientsScreen({Key? key}) : super(key: key);
+  const ClientsScreen({
+    Key? key,
+    this.clientNotifier,
+  }) : super(key: key);
+
+  final ValueNotifier<Client>? clientNotifier;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final clientBloc = context.read<ClientBloc>();
     return Scaffold(
-      appBar: const DrawerAppBar(title: 'Клиенты'),
+      appBar: PreferredSize(
+        preferredSize:
+            const Size.fromHeight(constant_sizes.preferredSizeHeight),
+        child: (clientNotifier != null)
+            ? const BackAppBar(
+                title: 'Клиенты',
+              )
+            : const DrawerAppBar(title: 'Клиенты'),
+      ),
       drawer: const AppDrawer(),
       body: BlocBuilder<ClientBloc, ClientState>(
         builder: (BuildContext context, ClientState state) {
@@ -25,6 +39,7 @@ class ClientsScreen extends StatelessWidget {
           } else if (state is ClientDataState) {
             return _ClientList(
               items: state.clients,
+              clientNotifier: clientNotifier,
             );
           } else if (state is ClientErrorState) {
             return ErrorCard(
@@ -67,9 +82,11 @@ class _ClientList extends StatefulWidget {
   const _ClientList({
     Key? key,
     required this.items,
+    required this.clientNotifier,
   }) : super(key: key);
 
   final List items;
+  final ValueNotifier<Client>? clientNotifier;
 
   @override
   __ClientListState createState() => __ClientListState();
@@ -87,7 +104,6 @@ class __ClientListState extends State<_ClientList> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final clientBloc = context.read<ClientBloc>();
     if (widget.items.isEmpty) {
       return Center(
         child: Text(
@@ -108,34 +124,10 @@ class __ClientListState extends State<_ClientList> {
         );
       },
       itemBuilder: (context, index) {
-        final item = widget.items[index];
-        return Slidable(
-          key: Key('${item.hashCode}'),
+        return ClientCard(
+          client: widget.items[index],
           controller: slidableController,
-          direction: Axis.horizontal,
-          actionPane: const SlidableDrawerActionPane(),
-          actionExtentRatio: 0.25,
-          child: ClientCard(
-            client: item,
-          ),
-          secondaryActions: <Widget>[
-            IconSlideAction(
-              caption: 'Удалить',
-              color: theme.errorColor,
-              icon: Icons.delete,
-              onTap: () {
-                showAskBottomSheet(
-                  context: context,
-                  title: 'Вы действительно хотите удалить клиента?',
-                  text1: 'Отмена',
-                  text2: 'Удалить',
-                  onPressed2: () {
-                    clientBloc.add(ClientDeleteEvent(item));
-                  },
-                );
-              },
-            ),
-          ],
+          clientNotifier: widget.clientNotifier,
         );
       },
     );

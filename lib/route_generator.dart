@@ -16,7 +16,11 @@ class RouteGenerator {
           OrderEditScreen(order: args['order']),
         );
       case constant_routes.clients:
-        return _left(const ClientsScreen());
+        return _left(
+          ClientsScreen(
+            clientNotifier: args['clientNotifier'],
+          ),
+        );
       case constant_routes.clientEdit:
         return _up(
           ClientEditScreen(client: args['client']),

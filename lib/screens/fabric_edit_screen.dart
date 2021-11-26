@@ -25,6 +25,9 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
   late final Fabric modFabric;
   late Fabric savedFabric;
 
+  late final FabricBloc fabricBloc;
+  late final OrderBloc orderBloc;
+
   @override
   void initState() {
     isCreated = ValueNotifier(widget.fabric.id != null);
@@ -32,6 +35,8 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
         (widget.fabric.retailPrice - widget.fabric.purchasePrice).toString());
     modFabric = Fabric.from(widget.fabric);
     savedFabric = Fabric.from(widget.fabric);
+    fabricBloc = context.read<FabricBloc>();
+    orderBloc = context.read<OrderBloc>();
     super.initState();
   }
 
@@ -42,19 +47,17 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
     super.dispose();
   }
 
+  void calcProfit() {
+    try {
+      profitNotifier.value =
+          (modFabric.retailPrice - modFabric.purchasePrice).toString();
+    } catch (e) {
+      profitNotifier.value = '?';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final fabricBloc = context.read<FabricBloc>();
-
-    void calcProfit() {
-      try {
-        profitNotifier.value =
-            (modFabric.retailPrice - modFabric.purchasePrice).toString();
-      } catch (e) {
-        profitNotifier.value = '?';
-      }
-    }
-
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -91,6 +94,8 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
                 isCreated.value = true;
                 fabricBloc.add(FabricAddEvent(savedFabric));
               }
+              // update OrderBloc
+              orderBloc.add(OrderLoadEvent());
               ScaffoldMessenger.of(context)
                 ..removeCurrentSnackBar()
                 ..showSnackBar(
