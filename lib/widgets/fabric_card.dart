@@ -5,7 +5,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../blocs/blocs.dart';
 import 'ask_bottom_sheet.dart';
-import 'fabrics_inherited.dart';
 import '../constants/routes.dart' as constant_routes;
 import '../constants/sizes.dart' as constant_sizes;
 
@@ -14,12 +13,12 @@ class FabricCard extends StatelessWidget {
     Key? key,
     required this.fabric,
     required this.controller,
-    this.fabricsInherited,
+    this.fabricsNotifier,
   }) : super(key: key);
 
   final Fabric fabric;
   final SlidableController controller;
-  final FabricsInherited? fabricsInherited;
+  final ValueNotifier<List<Fabric>>? fabricsNotifier;
 
   @override
   Widget build(BuildContext context) {
@@ -27,12 +26,10 @@ class FabricCard extends StatelessWidget {
     final fabricBloc = context.read<FabricBloc>();
 
     ValueNotifier<int> amount = ValueNotifier(0);
-    final ValueNotifier<bool> isSelected = ValueNotifier(false);
 
-    if (fabricsInherited != null) {
+    if (fabricsNotifier != null) {
       amount.value =
-          fabricsInherited!.selected.where((e) => e.id == fabric.id).length;
-      isSelected.value = fabricsInherited!.selected.contains(fabric);
+          fabricsNotifier!.value.where((e) => e.id == fabric.id).length;
     }
 
     return Slidable(
@@ -43,22 +40,27 @@ class FabricCard extends StatelessWidget {
       actionExtentRatio: 0.25,
       child: ListTile(
         hoverColor: theme.disabledColor,
-        leading: fabricsInherited != null
+        leading: fabricsNotifier != null
             ? ValueListenableBuilder(
-                valueListenable: isSelected,
-                builder: (context, bool value, child) {
+                valueListenable: amount,
+                builder: (context, int value, child) {
                   return Checkbox(
-                    value: value,
+                    value: value > 0,
                     checkColor: theme.scaffoldBackgroundColor,
                     fillColor: MaterialStateProperty.resolveWith(
                         (states) => theme.primaryColor),
                     onChanged: (bool? _) {
-                      if (value) {
-                        fabricsInherited!.removeAllItems(fabric);
-                        isSelected.value = false;
+                      if (value > 0) {
+                        if (fabricsNotifier!.value.contains(fabric)) {
+                          fabricsNotifier!.value = List.from(
+                              fabricsNotifier!.value
+                                ..removeWhere((e) => e.id == fabric.id));
+                        }
+                        amount.value = 0;
                       } else {
-                        fabricsInherited!.addItem(fabric);
-                        isSelected.value = true;
+                        fabricsNotifier!.value =
+                            List.from(fabricsNotifier!.value..add(fabric));
+                        amount.value = 1;
                       }
                     },
                   );
@@ -82,12 +84,15 @@ class FabricCard extends StatelessWidget {
             );
           },
         ),
-        trailing: (fabricsInherited != null)
-            ? FittedBox(
-                child: ValueListenableBuilder(
-                  valueListenable: amount,
-                  builder: (context, int value, child) {
-                    return Row(
+        trailing: (fabricsNotifier != null)
+            ? ValueListenableBuilder(
+                valueListenable: amount,
+                builder: (context, int value, child) {
+                  if (amount.value <= 0) {
+                    return const SizedBox.shrink();
+                  }
+                  return FittedBox(
+                    child: Row(
                       children: [
                         if (fabric.actualTime == null)
                           IconButton(
@@ -98,7 +103,8 @@ class FabricCard extends StatelessWidget {
                               if (amount.value > 0) {
                                 amount.value--;
                               }
-                              fabricsInherited!.removeOneItem(fabric);
+                              fabricsNotifier!.value = List.from(
+                                  fabricsNotifier!.value..remove(fabric));
                             },
                           ),
                         Text(
@@ -112,13 +118,14 @@ class FabricCard extends StatelessWidget {
                             splashRadius: constant_sizes.splashRadius,
                             onPressed: () {
                               amount.value++;
-                              fabricsInherited!.addItem(fabric);
+                              fabricsNotifier!.value = List.from(
+                                  fabricsNotifier!.value..add(fabric));
                             },
                           ),
                       ],
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               )
             : null,
         onTap: () {
@@ -142,6 +149,9 @@ class FabricCard extends StatelessWidget {
               text1: 'Отмена',
               text2: 'Удалить',
               onPressed2: () {
+                if(fabricsNotifier != null) {
+                  fabricsNotifier!.value = List.from(fabricsNotifier!.value..removeWhere((e) => e.id == fabric.id));
+                }
                 fabricBloc.add(FabricDeleteEvent(fabric));
               },
             );

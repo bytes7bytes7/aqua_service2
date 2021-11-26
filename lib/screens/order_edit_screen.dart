@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:order_repository/order_repository.dart';
 import 'package:image_repository/image_repository.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 import '../blocs/blocs.dart';
 import '../widgets/widgets.dart';
@@ -47,6 +48,7 @@ class __BodyState extends State<_Body> {
   late final ValueNotifier<bool> isDone;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final ValueNotifier<String> profitNotifier;
+  late final ValueNotifier<List<Fabric>> fabricsNotifier;
   late final Order modOrder;
   late Order savedOrder;
 
@@ -65,6 +67,7 @@ class __BodyState extends State<_Body> {
             widget.order.fabrics.fold(0,
                 (prev, curr) => prev + curr.retailPrice - curr.purchasePrice))
         .toString());
+    fabricsNotifier = ValueNotifier(modOrder.fabrics);
     orderBloc = context.read<OrderBloc>();
     avatarBloc = context.read<AvatarBloc>();
     avatarBloc.add(AvatarLoadEvent(modOrder.client.avatarPath));
@@ -76,6 +79,7 @@ class __BodyState extends State<_Body> {
     isCreated.dispose();
     isDone.dispose();
     profitNotifier.dispose();
+    fabricsNotifier.dispose();
     super.dispose();
   }
 
@@ -329,88 +333,87 @@ class __BodyState extends State<_Body> {
                     ),
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
-                      child: FabricsInherited(
-                        selected: modOrder.fabrics,
-                        child: Builder(builder: (context) {
-                          final fabricsInherited = FabricsInherited.of(context);
-                          return ListView.separated(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: modOrder.fabrics.length +
-                                (!modOrder.done || modOrder.fabrics.isEmpty
-                                    ? 1
-                                    : 0),
-                            separatorBuilder: (context, index) {
-                              return Divider(
-                                color: theme.disabledColor,
-                                thickness: 1,
-                                height: 1,
-                                indent: constant_sizes.textFieldVerPadding,
-                                endIndent: constant_sizes.textFieldVerPadding,
-                              );
-                            },
-                            itemBuilder: (context, index) {
-                              if (index == 0 && !modOrder.done) {
-                                // TODO: if (fabrics.length == 0) { place "Add button" on the center }
-                                return Material(
-                                  color: theme.scaffoldBackgroundColor,
-                                  child: InkWell(
-                                    splashColor: theme.disabledColor,
-                                    onTap: () async {
-                                      await Navigator.of(context).pushNamed(
-                                        constant_routes.fabrics,
-                                        arguments: {
-                                          'fabricsInherited': fabricsInherited,
-                                        },
-                                      );
-                                      setState(() {
-                                        // update fabrics
-                                      });
-                                    },
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 18.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'Добавить',
-                                            style: theme.textTheme.headline2!
-                                                .copyWith(
-                                                    color: theme.primaryColor),
-                                          ),
-                                          Icon(
-                                            Icons.add,
-                                            color: theme.primaryColor,
-                                          ),
-                                        ],
+                      child: ValueListenableBuilder(
+                          valueListenable: fabricsNotifier,
+                          builder: (context, List<Fabric> value, child) {
+                            // update modOrder
+                            modOrder.fabrics = value;
+                            List<Fabric> unique = value.toSet().toList();
+                            return ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: unique.length +
+                                  ((!modOrder.done || modOrder.fabrics.isEmpty)
+                                      ? 1
+                                      : 0),
+                              separatorBuilder: (context, index) {
+                                return Divider(
+                                  color: theme.disabledColor,
+                                  thickness: 1,
+                                  height: 1,
+                                  indent: constant_sizes.textFieldVerPadding,
+                                  endIndent: constant_sizes.textFieldVerPadding,
+                                );
+                              },
+                              itemBuilder: (context, index) {
+                                if (index == 0 && !modOrder.done) {
+                                  // TODO: if (fabrics.length == 0) { place "Add button" on the center }
+                                  return Material(
+                                    color: theme.scaffoldBackgroundColor,
+                                    child: InkWell(
+                                      splashColor: theme.disabledColor,
+                                      onTap: () {
+                                        Navigator.of(context).pushNamed(
+                                          constant_routes.fabrics,
+                                          arguments: {
+                                            'fabricsNotifier': fabricsNotifier,
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 18.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              'Добавить',
+                                              style: theme.textTheme.headline2!
+                                                  .copyWith(
+                                                      color:
+                                                          theme.primaryColor),
+                                            ),
+                                            Icon(
+                                              Icons.add,
+                                              color: theme.primaryColor,
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  );
+                                } else if (index == 0) {
+                                  // TODO: place it on the center
+                                  return Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 18.0),
+                                    child: Text('Пусто',
+                                        style: theme.textTheme.bodyText1!
+                                            .copyWith(
+                                                color: theme.disabledColor)),
+                                  );
+                                }
+                                return FabricCard(
+                                  fabric:
+                                      unique[index - (modOrder.done ? 0 : 1)],
+                                  controller: slidableController,
+                                  fabricsNotifier: fabricsNotifier,
                                 );
-                              } else if (index == 0) {
-                                // TODO: place it on the center
-                                return Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 18.0),
-                                  child: Text('Пусто',
-                                      style: theme.textTheme.bodyText1!
-                                          .copyWith(
-                                              color: theme.disabledColor)),
-                                );
-                              }
-                              return FabricCard(
-                                fabric: modOrder
-                                    .fabrics[index - (modOrder.done ? 0 : 1)],
-                                controller: slidableController,
-                                fabricsInherited: fabricsInherited,
-                              );
-                            },
-                          );
-                        }),
-                      ),
+                              },
+                            );
+                          }),
                     ),
                   ),
                   PaddingTextFieldNotifier(

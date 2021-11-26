@@ -12,70 +12,67 @@ import '../constants/sizes.dart' as constant_sizes;
 class FabricsScreen extends StatelessWidget {
   const FabricsScreen({
     Key? key,
-    this.fabricsInherited,
+    this.fabricsNotifier,
   }) : super(key: key);
 
-  final FabricsInherited? fabricsInherited;
+  final ValueNotifier<List<Fabric>>? fabricsNotifier;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final fabricBloc = context.read<FabricBloc>();
-    return FabricsInherited(
-      selected: fabricsInherited?.selected ?? [],
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize:
-              const Size.fromHeight(constant_sizes.preferredSizeHeight),
-          child: (fabricsInherited != null)
-              ? const BackAppBar(
-                  title: 'Материалы',
-                )
-              : const DrawerAppBar(title: 'Материалы'),
-        ),
-        drawer: const AppDrawer(),
-        body: BlocBuilder<FabricBloc, FabricState>(
-          builder: (BuildContext context, FabricState state) {
-            if (state is FabricLoadingState) {
-              return const LoadingCircle();
-            } else if (state is FabricDataState) {
-              return _FabricList(
-                items: state.fabrics,
-                fabricsInherited: fabricsInherited,
-              );
-            } else if (state is FabricErrorState) {
-              return ErrorCard(
-                error: state.error,
-                onRefresh: () {
-                  fabricBloc.add(FabricLoadEvent());
-                },
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
-        floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
-          builder: (BuildContext context, FabricState state) {
-            if (state is FabricDataState) {
-              return FloatingActionButton(
-                tooltip: constant_tooltips.add,
-                backgroundColor: theme.primaryColor,
-                child: const Icon(Icons.add),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    constant_routes.fabricEdit,
-                    arguments: {
-                      'fabric': Fabric(),
-                    },
-                  );
-                },
-              );
-            } else {
-              return const SizedBox.shrink();
-            }
-          },
-        ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize:
+        const Size.fromHeight(constant_sizes.preferredSizeHeight),
+        child: (fabricsNotifier != null)
+            ? const BackAppBar(
+          title: 'Материалы',
+        )
+            : const DrawerAppBar(title: 'Материалы'),
+      ),
+      drawer: const AppDrawer(),
+      body: BlocBuilder<FabricBloc, FabricState>(
+        builder: (BuildContext context, FabricState state) {
+          if (state is FabricLoadingState) {
+            return const LoadingCircle();
+          } else if (state is FabricDataState) {
+            return _FabricList(
+              items: state.fabrics,
+              fabricsNotifier: fabricsNotifier,
+            );
+          } else if (state is FabricErrorState) {
+            return ErrorCard(
+              error: state.error,
+              onRefresh: () {
+                fabricBloc.add(FabricLoadEvent());
+              },
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
+      ),
+      floatingActionButton: BlocBuilder<FabricBloc, FabricState>(
+        builder: (BuildContext context, FabricState state) {
+          if (state is FabricDataState) {
+            return FloatingActionButton(
+              tooltip: constant_tooltips.add,
+              backgroundColor: theme.primaryColor,
+              child: const Icon(Icons.add),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  constant_routes.fabricEdit,
+                  arguments: {
+                    'fabric': Fabric(),
+                  },
+                );
+              },
+            );
+          } else {
+            return const SizedBox.shrink();
+          }
+        },
       ),
     );
   }
@@ -85,11 +82,11 @@ class _FabricList extends StatefulWidget {
   const _FabricList({
     Key? key,
     required this.items,
-    required this.fabricsInherited,
+    required this.fabricsNotifier,
   }) : super(key: key);
 
   final List items;
-  final FabricsInherited? fabricsInherited;
+  final ValueNotifier<List<Fabric>>? fabricsNotifier;
 
   @override
   __FabricListState createState() => __FabricListState();
@@ -136,7 +133,7 @@ class __FabricListState extends State<_FabricList> {
         return FabricCard(
           fabric: item,
           controller: slidableController,
-          fabricsInherited: widget.fabricsInherited,
+          fabricsNotifier: widget.fabricsNotifier,
         );
       },
     );
