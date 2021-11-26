@@ -43,7 +43,10 @@ class FloatingLabelContainer extends StatelessWidget {
                 ),
               ),
             ),
-            child: child,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(constant_sizes.borderRadius),
+              child: child,
+            ),
           ),
           Positioned(
             top: 0,

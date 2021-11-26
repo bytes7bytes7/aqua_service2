@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:order_repository/order_repository.dart';
+import 'package:client_repository/client_repository.dart';
+import 'package:fabric_repository/fabric_repository.dart';
 
 import '../widgets/widgets.dart';
 import '../blocs/blocs.dart';
@@ -15,7 +17,6 @@ class OrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final orderBloc = context.read<OrderBloc>();
-    orderBloc.add(OrderLoadEvent());
     return Scaffold(
       appBar: const DrawerAppBar(title: 'Заказы'),
       drawer: const AppDrawer(),
@@ -47,17 +48,24 @@ class OrdersScreen extends StatelessWidget {
               backgroundColor: theme.primaryColor,
               child: const Icon(Icons.add),
               onPressed: () {
-                // orderBloc.add(OrderAddEvent(Order(
-                //   client: Client(id: 2),
-                //   fabrics: [Fabric(id: 1), Fabric(id: 2), Fabric(id: 3)],
-                //   date: DateTime.now(),
-                // )));
-                Navigator.of(context).pushNamed(
-                  constant_routes.orderEdit,
-                  arguments: {
-                    'order': Order(),
-                  },
-                );
+                if (true) {
+                  orderBloc.add(
+                    OrderAddEvent(
+                      Order(
+                        client: Client(id: 1),
+                        fabrics: [Fabric(id: 1), Fabric(id: 2)],
+                        date: DateTime.now(),
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).pushNamed(
+                    constant_routes.orderEdit,
+                    arguments: {
+                      'order': Order(),
+                    },
+                  );
+                }
               },
             );
           } else {

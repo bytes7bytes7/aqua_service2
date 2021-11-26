@@ -85,12 +85,12 @@ class Order {
     return OrderEntity(
       id: id,
       client: client.id!,
-      price: price,
-      fabrics: fabrics.map((e) => e.id).join(','),
-      expenses: expenses,
+      price: price != 0 ? price : null,
+      fabrics: fabrics.isNotEmpty ? fabrics.map((e) => e.id).join(',') : null,
+      expenses: expenses != 0 ? expenses : null,
       date: date.toString(),
       done: done ? 1 : 0,
-      comment: comment,
+      comment: comment.isNotEmpty ? comment : null,
     );
   }
 
@@ -99,10 +99,14 @@ class Order {
       id: entity.id,
       client: Client(id: entity.client),
       price: entity.price,
-      fabrics: entity.fabrics
-          ?.split(',')
-          .map<Fabric>((e) => Fabric(id: int.parse(e)))
-          .toList(),
+      fabrics: (entity.fabrics != null)
+          ? (entity.fabrics!.isNotEmpty
+              ? entity.fabrics
+                  ?.split(',')
+                  .map<Fabric>((e) => Fabric(id: int.parse(e)))
+                  .toList()
+              : [])
+          : [],
       expenses: entity.expenses,
       date: DateTime.parse(entity.date),
       done: entity.done == 1 ? true : false,

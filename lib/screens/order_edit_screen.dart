@@ -67,7 +67,9 @@ class __BodyState extends State<_Body> {
             widget.order.fabrics.fold(0,
                 (prev, curr) => prev + curr.retailPrice - curr.purchasePrice))
         .toString());
-    fabricsNotifier = ValueNotifier(modOrder.fabrics);
+    fabricsNotifier = ValueNotifier(List.from(modOrder.fabrics))..addListener(() {
+      calcProfit();
+    });
     orderBloc = context.read<OrderBloc>();
     avatarBloc = context.read<AvatarBloc>();
     avatarBloc.add(AvatarLoadEvent(modOrder.client.avatarPath));
@@ -83,24 +85,24 @@ class __BodyState extends State<_Body> {
     super.dispose();
   }
 
+  void calcProfit() {
+    modOrder.fabrics = List.from(fabricsNotifier.value);
+    try {
+      profitNotifier.value = (modOrder.price -
+          modOrder.expenses +
+          modOrder.fabrics.fold(
+              0,
+                  (prev, curr) =>
+              prev + curr.retailPrice - curr.purchasePrice))
+          .toString();
+    } catch (e) {
+      profitNotifier.value = '?';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    void calcProfit() {
-      try {
-        profitNotifier.value = (modOrder.price -
-                modOrder.expenses +
-                modOrder.fabrics.fold(
-                    0,
-                    (prev, curr) =>
-                        prev + curr.retailPrice - curr.purchasePrice))
-            .toString();
-      } catch (e) {
-        profitNotifier.value = '?';
-      }
-    }
-
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onTap: () {
@@ -134,6 +136,8 @@ class __BodyState extends State<_Body> {
                 currentState.validate() &&
                 modOrder.client.id != null) {
               currentState.save();
+              // TODO: remove this hardcode
+              modOrder.date = DateTime.parse('2021-10-01');
               modOrder.id ??= savedOrder.id;
               savedOrder = Order.from(modOrder);
               if (savedOrder.id != null) {
@@ -336,9 +340,7 @@ class __BodyState extends State<_Body> {
                       child: ValueListenableBuilder(
                           valueListenable: fabricsNotifier,
                           builder: (context, List<Fabric> value, child) {
-                            // update modOrder
-                            modOrder.fabrics = value;
-                            List<Fabric> unique = value.toSet().toList();
+                            List<Fabric> unique = List<Fabric>.from(value).toSet().toList();
                             return ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               itemCount: unique.length +

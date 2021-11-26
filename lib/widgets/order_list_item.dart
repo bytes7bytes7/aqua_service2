@@ -16,6 +16,7 @@ class OrderListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     String day = order.date.day.toString();
     String month = order.date.month.toString();
     String year = order.date.year.toString();
@@ -29,8 +30,10 @@ class OrderListItem extends StatelessWidget {
       year = year.substring(2);
     }
     final date = '$day.$month.$year';
-    int profit = order.price;
+
+    int profit = order.price - order.expenses;
     for (Fabric f in order.fabrics) {
+      print('Fabric\' id: ${f.id}');
       final retailPrice = f.retailPrice;
       final purchasePrice = f.purchasePrice;
       profit += retailPrice - purchasePrice;

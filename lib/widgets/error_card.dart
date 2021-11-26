@@ -33,11 +33,21 @@ class ErrorCard extends StatelessWidget {
               style: theme.textTheme.headline2,
             ),
             const SizedBox(height: 10),
-            SizedBox(
-              height: 80,
+            Container(
+              height: 100,
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10.0),
+                border: Border.all(
+                  color: theme.primaryColor,
+                ),
+              ),
               child: ListView(
                 children: [
-                  Text(error),
+                  Text(
+                    error,
+                    style: theme.textTheme.subtitle1,
+                  ),
                 ],
               ),
             ),

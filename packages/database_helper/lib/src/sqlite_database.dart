@@ -136,10 +136,18 @@ class SQLiteDatabase implements DatabaseHelper {
     if (params.isEmpty) {
       return await db.query(table);
     }
-    return await db.query(
-      table,
-      where: '${params.keys.first} IN (${params.values.first.join(', ')})',
-    );
+    List<Map<String, Object?>> lst = [];
+    List<Object> prev = [];
+    String key = params.keys.first;
+    for (Object obj in params.values.first) {
+      int i = prev.indexOf(obj);
+      if (i != -1) {
+        lst.add(lst[i]);
+      } else {
+        lst.add(await getNote(table, {key: obj}));
+      }
+    }
+    return lst;
   }
 
   @override
