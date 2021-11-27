@@ -54,6 +54,8 @@ class SQLiteFabricRepository implements FabricRepository {
   Future<List<Fabric>> getFabrics(List<int> id) async {
     var data = await SQLiteDatabase.instance
         .getNotes(constants.table, {constants.id: id});
+    var archived = await SQLiteDatabase.instance
+        .getNotes(constants.archiveTable, {constants.id: id});
     List<Fabric> fabrics = [];
     for (Map<String, Object?> m in data) {
       fabrics.add(Fabric.fromEntity(FabricEntity.fromMap(m)));
@@ -96,34 +98,50 @@ class SQLiteFabricRepository implements FabricRepository {
   }
 
   @override
-  Future<void> deleteFabric(Fabric fabric) async {
+  Future<void> archiveFabric(
+    Fabric fabric, {
+    bool delete = false,
+    DateTime? dateTime,
+  }) async {
+    fabric.expiredTime = dateTime ?? DateTime.now();
+    await SQLiteDatabase.instance.addNote(
+      constants.archiveTable,
+      fabric.toEntity().toMap(archived: true),
+    );
+    if (delete) {
+      _deleteFabric(fabric);
+    }
+  }
+
+  @override
+  Future<void> archiveFabrics(
+    List<Fabric> fabrics, {
+    bool delete = false,
+    DateTime? dateTime,
+  }) async {
+    List<Map<String, Object?>> lst = [];
+    DateTime now = DateTime.now();
+    for (Fabric f in fabrics) {
+      f.expiredTime = dateTime ?? now;
+      lst.add(f.toEntity().toMap(archived: true));
+    }
+    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
+    if (delete) {
+      _deleteFabrics(fabrics);
+    }
+  }
+
+  Future<void> _deleteFabric(Fabric fabric) async {
     SQLiteDatabase.instance.deleteNote(
       constants.table,
       {constants.id: fabric.id!},
     );
   }
 
-  @override
-  Future<void> deleteFabrics() async {
-    SQLiteDatabase.instance.deleteNotes(constants.table);
-  }
-
-  @override
-  Future<void> archiveFabric(Fabric fabric) async {
-    fabric.actualTime = DateTime.now();
-    await SQLiteDatabase.instance.addNote(
-      constants.archiveTable,
-      fabric.toEntity().toMap(archived: true),
+  Future<void> _deleteFabrics(List<Fabric> fabrics) async {
+    SQLiteDatabase.instance.deleteNotes(
+      constants.table,
+      {constants.id: fabrics.map<int>((e) => e.id!).toList()},
     );
-  }
-
-  @override
-  Future<void> archiveFabrics(List<Fabric> fabrics) async {
-    List<Map<String, Object?>> lst = [];
-    for (Fabric f in fabrics) {
-      f.actualTime = DateTime.now();
-      lst.add(f.toEntity().toMap(archived: true));
-    }
-    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
   }
 }

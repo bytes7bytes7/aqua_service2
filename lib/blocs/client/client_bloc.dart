@@ -51,7 +51,7 @@ class ClientBloc extends Bloc<ClientEvent, ClientState> {
 
   void _deleteClient(ClientDeleteEvent event, Emitter<ClientState> emit) {
     _clientRepository
-        .deleteClient(event.client)
+        .archiveClient(event.client, delete: true)
         .then((value) => add(ClientLoadEvent()));
   }
 }

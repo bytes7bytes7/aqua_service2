@@ -10,15 +10,20 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.onExit,
     this.onSave,
     this.snackBarMsg = 'Готово',
-  }) : super(key: key);
+    this.hasSearch = false,
+  })  : assert(!(hasSearch == true && onSave != null),
+            'Impossible configuration: hasSearch = true and onSave != null'),
+        super(key: key);
 
   final String title;
   final String snackBarMsg;
   final VoidCallback? onExit;
   final VoidCallback? onSave;
+  final bool hasSearch;
 
   @override
-  Size get preferredSize => const Size.fromHeight(constant_sizes.preferredSizeHeight);
+  Size get preferredSize =>
+      const Size.fromHeight(constant_sizes.preferredSizeHeight);
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +46,17 @@ class BackAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
       ),
       actions: [
+        if (hasSearch)
+          IconButton(
+            icon: const Icon(Icons.search),
+            color: theme.scaffoldBackgroundColor,
+            tooltip: constant_tooltips.search,
+            splashRadius: constant_sizes.splashRadius,
+            onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+              // TODO: add search
+            },
+          ),
         if (onSave != null)
           IconButton(
             icon: const Icon(Icons.done),

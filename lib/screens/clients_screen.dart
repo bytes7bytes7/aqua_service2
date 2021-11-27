@@ -28,8 +28,12 @@ class ClientsScreen extends StatelessWidget {
         child: (clientNotifier != null)
             ? const BackAppBar(
                 title: 'Клиенты',
+                hasSearch: true,
               )
-            : const DrawerAppBar(title: 'Клиенты'),
+            : const DrawerAppBar(
+                title: 'Клиенты',
+                hasSearch: true,
+              ),
       ),
       drawer: const AppDrawer(),
       body: BlocBuilder<ClientBloc, ClientState>(

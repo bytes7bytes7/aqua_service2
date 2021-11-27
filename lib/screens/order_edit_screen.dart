@@ -185,10 +185,12 @@ class __BodyState extends State<_Body> {
                     child: ValueListenableBuilder(
                       valueListenable: clientNotifier,
                       builder: (context, Client value, child) {
+                        // TODO: create separate widget from ClientCard
                         return ClientCard(
                           client: value,
                           controller: slidableController,
                           clientNotifier: clientNotifier,
+                          isSelected: true,
                         );
                         return Row(
                           children: [

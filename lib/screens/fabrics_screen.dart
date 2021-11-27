@@ -24,12 +24,16 @@ class FabricsScreen extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize:
-        const Size.fromHeight(constant_sizes.preferredSizeHeight),
+            const Size.fromHeight(constant_sizes.preferredSizeHeight),
         child: (fabricsNotifier != null)
             ? const BackAppBar(
-          title: 'Материалы',
-        )
-            : const DrawerAppBar(title: 'Материалы'),
+                title: 'Материалы',
+                hasSearch: true,
+              )
+            : const DrawerAppBar(
+                title: 'Материалы',
+                hasSearch: true,
+              ),
       ),
       drawer: const AppDrawer(),
       body: BlocBuilder<FabricBloc, FabricState>(

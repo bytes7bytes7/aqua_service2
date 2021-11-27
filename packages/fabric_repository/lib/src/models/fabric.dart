@@ -6,7 +6,7 @@ class Fabric {
     String? title,
     int? retailPrice,
     int? purchasePrice,
-    this.actualTime,
+    this.expiredTime,
   })  : title = title ?? '',
         retailPrice = retailPrice ?? 0,
         purchasePrice = purchasePrice ?? 0;
@@ -15,7 +15,7 @@ class Fabric {
   String title;
   int retailPrice;
   int purchasePrice;
-  DateTime? actualTime;
+  DateTime? expiredTime;
 
   @override
   int get hashCode {
@@ -23,7 +23,7 @@ class Fabric {
         title.hashCode ^
         retailPrice.hashCode ^
         purchasePrice.hashCode ^
-        actualTime.hashCode;
+    expiredTime.hashCode;
   }
 
   Fabric.from(Fabric other)
@@ -31,7 +31,7 @@ class Fabric {
         title = other.title,
         retailPrice = other.retailPrice,
         purchasePrice = other.purchasePrice,
-        actualTime = other.actualTime;
+        expiredTime = other.expiredTime;
 
   @override
   bool operator ==(Object other) {
@@ -41,7 +41,7 @@ class Fabric {
             title == other.title &&
             retailPrice == other.retailPrice &&
             purchasePrice == other.purchasePrice &&
-            actualTime == other.actualTime;
+            expiredTime == other.expiredTime;
   }
 
   @override
@@ -51,7 +51,7 @@ class Fabric {
         'title: $title, '
         'retailPrice: $retailPrice, '
         'purchasePrice: $purchasePrice, '
-        'actualTime: $actualTime'
+        'expiredTime: $expiredTime'
         '}';
   }
 
@@ -61,7 +61,7 @@ class Fabric {
       title: title,
       retailPrice: retailPrice != 0 ? retailPrice : null,
       purchasePrice: purchasePrice != 0 ? purchasePrice : null,
-      actualTime: actualTime?.toString(),
+      expiredTime: expiredTime?.toString(),
     );
   }
 
@@ -71,8 +71,8 @@ class Fabric {
       title: entity.title,
       retailPrice: entity.retailPrice,
       purchasePrice: entity.purchasePrice,
-      actualTime:
-          entity.actualTime != null ? DateTime.parse(entity.actualTime!) : null,
+      expiredTime:
+          entity.expiredTime != null ? DateTime.parse(entity.expiredTime!) : null,
     );
   }
 }

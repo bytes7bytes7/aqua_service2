@@ -10,9 +10,11 @@ class FabricEditScreen extends StatefulWidget {
   const FabricEditScreen({
     Key? key,
     required this.fabric,
+    this.fabricsNotifier,
   }) : super(key: key);
 
   final Fabric fabric;
+  final ValueNotifier<List<Fabric>>? fabricsNotifier;
 
   @override
   State<FabricEditScreen> createState() => _FabricEditScreenState();
@@ -93,6 +95,17 @@ class _FabricEditScreenState extends State<FabricEditScreen> {
               } else {
                 isCreated.value = true;
                 fabricBloc.add(FabricAddEvent(savedFabric));
+              }
+              // TODO: try to delete (=archive) fabric while editing order
+              // update info on OrderEditScreen
+              if (widget.fabricsNotifier != null) {
+                int length = widget.fabricsNotifier!.value.length;
+                widget.fabricsNotifier!.value
+                    .removeWhere((e) => e.id == modFabric.id);
+                widget.fabricsNotifier!.value.addAll(List.generate(
+                    length - widget.fabricsNotifier!.value.length,
+                    (index) => modFabric));
+                widget.fabricsNotifier!.value = List.from(widget.fabricsNotifier!.value);
               }
               // update OrderBloc
               orderBloc.add(OrderLoadEvent());

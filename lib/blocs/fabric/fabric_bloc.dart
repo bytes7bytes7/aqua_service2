@@ -45,7 +45,7 @@ class FabricBloc extends Bloc<FabricEvent, FabricState> {
 
   void _deleteFabric(FabricDeleteEvent event, Emitter<FabricState> emit) {
     _fabricRepository
-        .deleteFabric(event.fabric)
+        .archiveFabric(event.fabric, delete: true)
         .then((value) => add(FabricLoadEvent()));
   }
 }

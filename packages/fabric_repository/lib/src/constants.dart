@@ -7,10 +7,10 @@ const String retailPrice = 'retailPrice';
 const String purchasePrice = 'purchasePrice';
 
 // time for archive table
-const String actualTime = 'actualTime';
+const String expiredTime = 'expiredTime';
 
 Map<String, Map<Type, bool>> timeField = {
-  actualTime: {String: false},
+  expiredTime: {String: false},
 };
 
 Map<String, Map<Type, bool>> fields = {

@@ -20,7 +20,8 @@ class SQLiteClientRepository implements ClientRepository {
   @override
   Future<void> initTable() async {
     await SQLiteDatabase.instance.init(constants.table, constants.fields);
-    await SQLiteDatabase.instance.init(constants.archiveTable, constants.fields..addAll(constants.timeField), false);
+    await SQLiteDatabase.instance.init(constants.archiveTable,
+        constants.fields..addAll(constants.timeField), false);
     await _setMaxID();
   }
 
@@ -79,7 +80,7 @@ class SQLiteClientRepository implements ClientRepository {
 
   @override
   Future<void> updateClient(Client client) async {
-     SQLiteDatabase.instance.updateNote(
+    SQLiteDatabase.instance.updateNote(
       constants.table,
       client.toEntity().toMap(),
       {constants.id: client.id!},
@@ -87,34 +88,50 @@ class SQLiteClientRepository implements ClientRepository {
   }
 
   @override
-  Future<void> deleteClient(Client client) async {
-     SQLiteDatabase.instance.deleteNote(
+  Future<void> archiveClient(
+    Client client, {
+    bool delete = false,
+    DateTime? dateTime,
+  }) async {
+    client.actualTime = dateTime ?? DateTime.now();
+    await SQLiteDatabase.instance.addNote(
+      constants.archiveTable,
+      client.toEntity().toMap(archived: true),
+    );
+    if (delete) {
+      _deleteClient(client);
+    }
+  }
+
+  @override
+  Future<void> archiveClients(
+    List<Client> clients, {
+    bool delete = false,
+    DateTime? dateTime,
+  }) async {
+    List<Map<String, Object?>> lst = [];
+    DateTime now = DateTime.now();
+    for (Client c in clients) {
+      c.actualTime = dateTime ?? now;
+      lst.add(c.toEntity().toMap(archived: true));
+    }
+    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
+    if (delete) {
+      _deleteClients(clients);
+    }
+  }
+
+  Future<void> _deleteClient(Client client) async {
+    SQLiteDatabase.instance.deleteNote(
       constants.table,
       {constants.id: client.id!},
     );
   }
 
-  @override
-  Future<void> deleteClients() async {
-     SQLiteDatabase.instance.deleteNotes(constants.table);
-  }
-
-  @override
-  Future<void> archiveClient(Client client) async {
-    client.actualTime = DateTime.now();
-    await SQLiteDatabase.instance.addNote(
-      constants.archiveTable,
-      client.toEntity().toMap(archived: true),
+  Future<void> _deleteClients(List<Client> clients) async {
+    SQLiteDatabase.instance.deleteNotes(
+      constants.table,
+      {constants.id: clients.map<int>((e) => e.id!).toList()},
     );
-  }
-
-  @override
-  Future<void> archiveClients(List<Client> clients) async {
-    List<Map<String, Object?>> lst = [];
-    for (Client c in clients) {
-      c.actualTime = DateTime.now();
-      lst.add(c.toEntity().toMap(archived: true));
-    }
-    SQLiteDatabase.instance.addNotes(constants.archiveTable, lst);
   }
 }

@@ -171,20 +171,33 @@ class SQLiteDatabase implements DatabaseHelper {
   Future<void> updateNote(String table, Map<String, Object?> map,
       Map<String, Object> params) async {
     final db = await database;
-    await db.update(table, map,
-        where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
+    await db.update(
+      table,
+      map,
+      where: '${params.keys.first} = ?',
+      whereArgs: [params.values.first],
+    );
   }
 
   @override
   Future<void> deleteNote(String table, Map<String, Object> params) async {
     final db = await database;
-    await db.delete(table,
-        where: '${params.keys.first} = ?', whereArgs: [params.values.first]);
+    await db.delete(
+      table,
+      where: '${params.keys.first} = ?',
+      whereArgs: [params.values.first],
+    );
   }
 
+  // TODO: try it
   @override
-  Future<void> deleteNotes(String table) async {
+  Future<void> deleteNotes(
+      String table, Map<String, List<Object>> params) async {
     final db = await database;
-    await db.delete(table);
+    await db.delete(
+      table,
+      where: '${params.keys.first} IN (?)',
+      whereArgs: params.values.first,
+    );
   }
 }

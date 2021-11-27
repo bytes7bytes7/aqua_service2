@@ -41,7 +41,10 @@ class RouteGenerator {
         );
       case constant_routes.fabricEdit:
         return _up(
-          FabricEditScreen(fabric: args['fabric']),
+          FabricEditScreen(
+            fabric: args['fabric'],
+            fabricsNotifier: args['fabricsNotifier'],
+          ),
         );
       case constant_routes.about:
         return _left(const AboutScreen());

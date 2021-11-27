@@ -81,17 +81,27 @@ class ClientCard extends StatelessWidget {
           client.city,
           style: theme.textTheme.subtitle1,
         ),
-        trailing: client.phone.isNotEmpty
+        trailing: (clientNotifier != null && isSelected)
             ? IconButton(
-                icon: const Icon(Icons.phone),
-                tooltip: constant_tooltips.call,
+                icon: const Icon(Icons.edit),
+                tooltip: constant_tooltips.choose,
                 splashRadius: constant_sizes.splashRadius,
                 color: theme.primaryColor,
                 onPressed: () {
-                  url_launcher.launch("tel://${client.phone}");
+                  // TODO: add navigation to ClientsScreen
                 },
               )
-            : const SizedBox.shrink(),
+            : (clientNotifier == null && client.phone.isNotEmpty)
+                ? IconButton(
+                    icon: const Icon(Icons.phone),
+                    tooltip: constant_tooltips.call,
+                    splashRadius: constant_sizes.splashRadius,
+                    color: theme.primaryColor,
+                    onPressed: () {
+                      url_launcher.launch("tel://${client.phone}");
+                    },
+                  )
+                : const SizedBox.shrink(),
         onTap: () {
           Navigator.of(context).pushNamed(
             constant_routes.clientEdit,

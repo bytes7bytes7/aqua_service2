@@ -29,5 +29,5 @@ abstract class DatabaseHelper {
 
   Future<void> deleteNote(String table, Map<String, Object> params);
 
-  Future<void> deleteNotes(String table);
+  Future<void> deleteNotes(String table, Map<String, List<Object>> params);
 }

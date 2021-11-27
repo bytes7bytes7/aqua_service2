@@ -17,11 +17,15 @@ abstract class ClientRepository {
 
   Future<void> updateClient(Client client);
 
-  Future<void> deleteClient(Client client);
+  Future<void> archiveClient(
+    Client client, {
+    bool delete = false,
+    DateTime? dateTime,
+  });
 
-  Future<void> deleteClients();
-
-  Future<void> archiveClient(Client client);
-
-  Future<void> archiveClients(List<Client> clients);
+  Future<void> archiveClients(
+    List<Client> client, {
+    bool delete = false,
+    DateTime? dateTime,
+  });
 }

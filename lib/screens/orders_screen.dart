@@ -18,7 +18,10 @@ class OrdersScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final orderBloc = context.read<OrderBloc>();
     return Scaffold(
-      appBar: const DrawerAppBar(title: 'Заказы'),
+      appBar: const DrawerAppBar(
+        title: 'Заказы',
+        hasSearch: true,
+      ),
       drawer: const AppDrawer(),
       body: BlocBuilder<OrderBloc, OrderState>(
         builder: (BuildContext context, OrderState state) {

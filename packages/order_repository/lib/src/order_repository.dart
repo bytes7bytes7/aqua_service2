@@ -18,11 +18,11 @@ abstract class OrderRepository {
 
   Future<void> updateOrder(Order order);
 
-  Future<void> deleteOrder(Order order);
-
-  Future<void> deleteOrders();
-
   Future<void> archiveOrder(Order order);
 
   Future<void> archiveOrders(List<Order> orders);
+
+  Future<void> deleteOrder(Order order);
+
+  Future<void> deleteOrders(List<Order> orders);
 }

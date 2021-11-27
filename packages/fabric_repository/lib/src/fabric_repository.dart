@@ -19,11 +19,15 @@ abstract class FabricRepository {
 
   Future<void> updateFabric(Fabric fabric);
 
-  Future<void> deleteFabric(Fabric fabric);
+  Future<void> archiveFabric(
+    Fabric fabric, {
+    bool delete = false,
+    DateTime? dateTime,
+  });
 
-  Future<void> deleteFabrics();
-
-  Future<void> archiveFabric(Fabric fabric);
-
-  Future<void> archiveFabrics(List<Fabric> fabrics);
+  Future<void> archiveFabrics(
+    List<Fabric> fabrics, {
+    bool delete = false,
+    DateTime? dateTime,
+  });
 }

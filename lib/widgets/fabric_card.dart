@@ -91,7 +91,7 @@ class FabricCard extends StatelessWidget {
                   return FittedBox(
                     child: Row(
                       children: [
-                        if (fabric.actualTime == null)
+                        if (fabric.expiredTime == null)
                           IconButton(
                             icon: const Icon(Icons.keyboard_arrow_left),
                             color: theme.primaryColor,
@@ -108,7 +108,7 @@ class FabricCard extends StatelessWidget {
                           '$value',
                           style: theme.textTheme.headline2!.copyWith(),
                         ),
-                        if (fabric.actualTime == null)
+                        if (fabric.expiredTime == null)
                           IconButton(
                             icon: const Icon(Icons.keyboard_arrow_right),
                             color: theme.primaryColor,
@@ -130,6 +130,7 @@ class FabricCard extends StatelessWidget {
             constant_routes.fabricEdit,
             arguments: {
               'fabric': fabric,
+              'fabricsNotifier': fabricsNotifier,
             },
           );
         },

@@ -98,19 +98,6 @@ class SQLiteOrderRepository implements OrderRepository {
   }
 
   @override
-  Future<void> deleteOrder(Order order) async {
-    SQLiteDatabase.instance.deleteNote(
-      constants.table,
-      {constants.id: order.id!},
-    );
-  }
-
-  @override
-  Future<void> deleteOrders() async {
-    SQLiteDatabase.instance.deleteNotes(constants.table);
-  }
-
-  @override
   Future<void> archiveOrder(Order order) async {
     order.done = true;
     await updateOrder(order);
@@ -118,8 +105,10 @@ class SQLiteOrderRepository implements OrderRepository {
     final clientRepo = SQLiteClientRepository();
     final fabricRepo = SQLiteFabricRepository();
 
-    await clientRepo.archiveClient(order.client);
-    await fabricRepo.archiveFabrics(order.fabrics);
+    DateTime now = DateTime.now();
+
+    await clientRepo.archiveClient(order.client, dateTime: now);
+    await fabricRepo.archiveFabrics(order.fabrics, dateTime: now);
   }
 
   @override
@@ -137,7 +126,25 @@ class SQLiteOrderRepository implements OrderRepository {
       fabrics.addAll(order.fabrics);
     }
 
-    await clientRepo.archiveClients(clients);
-    await fabricRepo.archiveFabrics(fabrics);
+    DateTime now = DateTime.now();
+
+    await clientRepo.archiveClients(clients, dateTime: now);
+    await fabricRepo.archiveFabrics(fabrics, dateTime: now);
+  }
+
+  @override
+  Future<void> deleteOrder(Order order) async {
+    SQLiteDatabase.instance.deleteNote(
+      constants.table,
+      {constants.id: order.id!},
+    );
+  }
+
+  @override
+  Future<void> deleteOrders(List<Order> orders) async {
+    SQLiteDatabase.instance.deleteNotes(
+      constants.table,
+      {constants.id: orders.map<int>((e) => e.id!).toList()},
+    );
   }
 }
